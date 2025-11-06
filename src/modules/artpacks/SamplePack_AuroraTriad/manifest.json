@@ -1,0 +1,13 @@
+{
+  "id": "aurora-triad-v1",
+  "name": "Aurora Triad",
+  "version": "1.0.0",
+  "author": "Sacred Shifter Team",
+  "description": "Coherence-driven aurora effect with sine-modulated hue and amplitude responding to regional harmonics and live collective field data.",
+  "entry": "index.ts",
+  "minEngine": "1.0.0",
+  "safety": {
+    "maxStrobeHz": 2.5,
+    "photosensitiveWarning": false
+  }
+}
