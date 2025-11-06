@@ -1,7 +1,7 @@
-import { ResonancePortraitDemo } from './pages/demo/ResonancePortraitDemo';
+import { MetaphysicalOSDemo } from './pages/MetaphysicalOSDemo';
 
 function App() {
-  return <ResonancePortraitDemo />;
+  return <MetaphysicalOSDemo />;
 }
 
 export default App;
