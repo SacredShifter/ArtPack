@@ -1,0 +1,17 @@
+{
+  "id": "fractal-bloom-organic",
+  "name": "Fractal Bloom (Organic)",
+  "version": "2.0.0",
+  "author": "Sacred Shifter Collective",
+  "description": "Sacred geometry unfolds in infinite detail. Living fractals bloom like flowers, with recursive petals emerging from the center. Julia sets morph into organic mandalas. Each coherence pulse births new layers of crystalline beauty. Watch mathematical precision become living art.",
+  "esm_url": "index.js",
+  "minEngine": "1.0.0",
+  "tags": ["fractal", "organic", "blooming", "geometric", "psychedelic", "mathematical", "living"],
+  "telos": ["enable-creative-expression", "facilitate-transcendence", "celebrate-joy"],
+  "safety": {
+    "maxStrobeHz": 2.0,
+    "photosensitiveWarning": false,
+    "lowSensoryFriendly": false
+  },
+  "metaphysicalNotes": "Where mathematics becomes biology. Fractals are nature's design language - this pack reveals how infinite complexity emerges from simple recursive rules, just like consciousness itself."
+}
