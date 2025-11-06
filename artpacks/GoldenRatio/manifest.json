@@ -1,0 +1,17 @@
+{
+  "id": "golden-ratio-spiral",
+  "name": "Golden Ratio Spiral",
+  "version": "1.0.0",
+  "author": "Sacred Shifter Collective",
+  "description": "Pure mathematical beauty encoded in Phi (1.618...). The spiral of galaxies, nautilus shells, and DNA. Watch sacred geometry unfold in real-time, responding to your breath and coherence. As above, so below. As within, so without.",
+  "esm_url": "index.js",
+  "minEngine": "1.0.0",
+  "tags": ["sacred-geometry", "mathematical", "golden", "fibonacci", "meditative", "mystical", "transcendent"],
+  "telos": ["facilitate-transcendence", "enable-creative-expression", "support-meditative-states"],
+  "safety": {
+    "maxStrobeHz": 2.0,
+    "photosensitiveWarning": false,
+    "lowSensoryFriendly": true
+  },
+  "metaphysicalNotes": "Phi (φ) is the divine proportion, the fingerprint of God in nature. This pack makes visible the invisible architecture of creation itself."
+}

@@ -1,0 +1,17 @@
+{
+  "id": "flower-of-life",
+  "name": "Flower of Life Genesis",
+  "version": "1.0.0",
+  "author": "Sacred Shifter Collective",
+  "description": "The ancient symbol containing all of creation. Seven circles birthing infinite patterns. Metatron's Cube. The Seed of Life. Platonic Solids. All geometric forms emerge from this primal flower. Watch it bloom with your consciousness.",
+  "esm_url": "index.js",
+  "minEngine": "1.0.0",
+  "tags": ["sacred-geometry", "mystical", "ancient", "healing", "transcendent", "meditative", "blueprint"],
+  "telos": ["facilitate-transcendence", "support-meditative-states", "enable-creative-expression"],
+  "safety": {
+    "maxStrobeHz": 1.5,
+    "photosensitiveWarning": false,
+    "lowSensoryFriendly": true
+  },
+  "metaphysicalNotes": "The Flower of Life is the blueprint of creation itself. Every form in the universe can be derived from its pattern. This pack reveals the unfolding of the One into the Many."
+}

@@ -1,0 +1,17 @@
+{
+  "id": "eternal-void",
+  "name": "Eternal Void",
+  "version": "1.0.0",
+  "author": "Sacred Shifter Collective",
+  "description": "Confrontation with the infinite emptiness that precedes form. A meditation on the pregnant void where all potential resides. Black becomes luminous. Silence becomes deafening. Surrender to the nothing that contains everything.",
+  "esm_url": "index.js",
+  "minEngine": "1.0.0",
+  "tags": ["void", "minimal", "meditative", "ego-dissolution", "dark", "zen", "mystical"],
+  "telos": ["process-shadow", "facilitate-transcendence", "support-meditative-states"],
+  "safety": {
+    "maxStrobeHz": 0.5,
+    "photosensitiveWarning": false,
+    "lowSensoryFriendly": true
+  },
+  "metaphysicalNotes": "The void is not empty but full of unmanifest potential. This pack guides the practitioner through ego dissolution into the primordial darkness where all creation begins."
+}

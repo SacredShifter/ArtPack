@@ -1,0 +1,17 @@
+{
+  "id": "consciousness-fractal",
+  "name": "Consciousness Fractal",
+  "version": "1.0.0",
+  "author": "Sacred Shifter Collective",
+  "description": "Self-similar patterns reflecting the infinite nature of awareness. Each layer contains the whole. The observer becomes the observed. Mandelbrot meets mysticism. High coherence reveals deeper dimensions. Compatible with Silence Amplifier for profound stillness journeys.",
+  "esm_url": "index.js",
+  "minEngine": "1.0.0",
+  "tags": ["fractal", "psychedelic", "infinite", "mystical", "transcendent", "mathematical", "consciousness"],
+  "telos": ["facilitate-transcendence", "enable-creative-expression", "process-shadow"],
+  "safety": {
+    "maxStrobeHz": 2.5,
+    "photosensitiveWarning": true,
+    "lowSensoryFriendly": false
+  },
+  "metaphysicalNotes": "Fractals are the geometry of consciousness itself - infinite depth, self-referential, emerging from simple rules into infinite complexity. As you go deeper, you find yourself again."
+}
