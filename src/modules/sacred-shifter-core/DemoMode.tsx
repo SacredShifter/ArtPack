@@ -5,7 +5,8 @@ import { GAAClock } from './GAAClock';
 import { SonicOrchestrator } from './SonicOrchestrator';
 import { ParticipantEncoder, ParticipantSignature } from './ParticipantEncoder';
 import { RegionSeed, CoherenceSample } from './types';
-import { Users, User, UsersRound, Globe, Play, Pause, RefreshCw } from 'lucide-react';
+import { SnapshotCapture } from './SnapshotCapture';
+import { Users, User, UsersRound, Globe, Play, Pause, RefreshCw, Camera, Download } from 'lucide-react';
 
 type DemoMode = 'individual' | 'small_group' | 'large_group' | 'massive';
 
@@ -47,6 +48,8 @@ export function DemoMode() {
   const [isPlaying, setIsPlaying] = useState(true);
   const [participants, setParticipants] = useState<ParticipantSignature[]>([]);
   const [fps, setFps] = useState(0);
+  const [isCapturing, setIsCapturing] = useState(false);
+  const [captureSuccess, setCaptureSuccess] = useState(false);
 
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const sceneRef = useRef<THREE.Scene | null>(null);
@@ -243,6 +246,37 @@ export function DemoMode() {
     setParticipants(generateParticipants(info.participants));
   };
 
+  const handleCaptureSnapshot = async () => {
+    if (!canvasRef.current || isCapturing) return;
+
+    setIsCapturing(true);
+    setCaptureSuccess(false);
+
+    try {
+      const result = await SnapshotCapture.captureCanvas(canvasRef.current, {
+        mode,
+        participantCount: info.participants,
+        timestamp: Date.now(),
+        fps
+      });
+
+      if (result) {
+        setCaptureSuccess(true);
+        setTimeout(() => setCaptureSuccess(false), 3000);
+      }
+    } catch (error) {
+      console.error('Snapshot capture failed:', error);
+    } finally {
+      setIsCapturing(false);
+    }
+  };
+
+  const handleDownloadSnapshot = () => {
+    if (!canvasRef.current) return;
+    const filename = `sacred-shifter-${mode}-${Date.now()}.png`;
+    SnapshotCapture.downloadImage(canvasRef.current, filename);
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900/20 to-slate-900">
       <div className="container mx-auto px-4 py-8">
@@ -362,6 +396,37 @@ export function DemoMode() {
                 <RefreshCw className="w-4 h-4" />
                 Reset
               </button>
+            </div>
+
+            <div className="bg-slate-800/40 backdrop-blur-md border border-purple-500/30 rounded-xl p-4 space-y-3">
+              <h3 className="font-semibold text-white text-sm mb-3">Capture</h3>
+
+              <button
+                onClick={handleCaptureSnapshot}
+                disabled={isCapturing}
+                className={`w-full px-4 py-2 rounded-lg transition-all flex items-center justify-center gap-2 ${
+                  captureSuccess
+                    ? 'bg-green-600 text-white'
+                    : isCapturing
+                    ? 'bg-purple-400 text-white cursor-wait'
+                    : 'bg-purple-600 text-white hover:bg-purple-500'
+                }`}
+              >
+                <Camera className="w-4 h-4" />
+                {isCapturing ? 'Capturing...' : captureSuccess ? 'Saved!' : 'Save to Cloud'}
+              </button>
+
+              <button
+                onClick={handleDownloadSnapshot}
+                className="w-full px-4 py-2 bg-slate-700 text-white rounded-lg hover:bg-slate-600 transition-all flex items-center justify-center gap-2"
+              >
+                <Download className="w-4 h-4" />
+                Download PNG
+              </button>
+
+              <p className="text-xs text-purple-200/50 text-center mt-2">
+                Snapshots are saved to your gallery
+              </p>
             </div>
 
             {mode === 'small_group' && (
