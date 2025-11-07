@@ -10,6 +10,7 @@ export { CollectiveSession } from './CollectiveSession';
 export { ParticipantEncoder } from './ParticipantEncoder';
 export { JoinSessionPage } from './JoinSessionPage';
 export { CreateSessionPage } from './CreateSessionPage';
+export { DemoMode } from './DemoMode';
 
 export type {
   RegionSeed,
