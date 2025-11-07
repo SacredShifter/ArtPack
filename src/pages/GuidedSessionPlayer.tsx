@@ -5,8 +5,10 @@ import { packEngine } from '../modules/sacred-shifter-core/PackEngine';
 import { GAAClock } from '../modules/sacred-shifter-core/GAAClock';
 import { GuidedSessionEngine } from '../modules/sacred-shifter-core/GuidedSessionEngine';
 import type { BreathCue } from '../modules/sacred-shifter-core/GuidedSessionEngine';
-import { RevelationPhase } from '../modules/sacred-shifter-core/RevelationManager';
-import { ArrowLeft, Play, Pause, RotateCcw } from 'lucide-react';
+import { RevelationManager, RevelationPhase } from '../modules/sacred-shifter-core/RevelationManager';
+import { EvolutionEngine } from '../modules/mirror-unseen/evolution';
+import { ArrowLeft, Play, Pause, RotateCcw, Download } from 'lucide-react';
+import html2canvas from 'html2canvas';
 
 export function GuidedSessionPlayer() {
   const { sessionId } = useParams<{ sessionId: string }>();
@@ -15,12 +17,26 @@ export function GuidedSessionPlayer() {
   const [session, setSession] = useState<any>(null);
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentPhase, setCurrentPhase] = useState<RevelationPhase>(RevelationPhase.RECOGNITION);
+  const [phaseTeaching, setPhaseTeaching] = useState<string>('');
   const [breathGuidance, setBreathGuidance] = useState<any>(null);
   const [elapsedTime, setElapsedTime] = useState(0);
   const [narration, setNarration] = useState<string>('');
+  const [formType, setFormType] = useState<string>('circle');
+  const [visualCues, setVisualCues] = useState<string[]>([]);
+
+  const [evoInputs, setEvoInputs] = useState({
+    Coh: 0.5,
+    Cx: 0.3,
+    Pol: 0.5,
+    U: 0.5,
+    Syn: 0.4,
+    Res: 0.3
+  });
 
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const engineRef = useRef<GuidedSessionEngine>(new GuidedSessionEngine());
+  const revelationRef = useRef<RevelationManager | null>(null);
+  const evolutionRef = useRef<EvolutionEngine>(new EvolutionEngine());
   const sceneRef = useRef<THREE.Scene | null>(null);
   const rendererRef = useRef<THREE.WebGLRenderer | null>(null);
   const gaaClockRef = useRef<GAAClock | null>(null);
@@ -32,30 +48,56 @@ export function GuidedSessionPlayer() {
   }, [sessionId]);
 
   useEffect(() => {
-    if (isPlaying) {
+    if (isPlaying && revelationRef.current) {
       const interval = setInterval(() => {
         const elapsed = (Date.now() - startTimeRef.current) / 1000;
         setElapsedTime(elapsed);
 
-        const cues = engineRef.current.getActiveCues(currentPhase);
+        updateConsciousnessMetrics();
 
-        if (cues.breath) {
-          const guidance = engineRef.current.generateBreathGuidance(cues.breath);
-          setBreathGuidance(guidance);
+        const teaching = revelationRef.current!.update({
+          coherence: evoInputs.Coh,
+          complexity: evoInputs.Cx,
+          polarity: evoInputs.Pol,
+          residual: evoInputs.Res,
+          uncertainty: evoInputs.U
+        });
+
+        if (teaching) {
+          setPhaseTeaching(teaching.caption);
+          setNarration(teaching.audioScript || '');
+          setTimeout(() => setNarration(''), 5000);
         }
 
-        if (cues.sound && cues.sound.length > 0) {
-          const latestSound = cues.sound[cues.sound.length - 1];
-          if (latestSound.type === 'narration' && latestSound.content) {
-            setNarration(latestSound.content);
-            setTimeout(() => setNarration(''), latestSound.duration_sec * 1000);
-          }
+        setCurrentPhase(revelationRef.current!.getCurrentPhase());
+
+        const elementRatios = { fire: 0.25, earth: 0.25, air: 0.25, water: 0.25 };
+        const evoParams = evolutionRef.current.computeEvoParams(evoInputs, elementRatios);
+        const transition = evolutionRef.current.checkTransition(evoInputs, evoParams);
+
+        if (transition) {
+          setFormType(transition.toForm);
+        }
+
+        const cues = revelationRef.current!.getVisualizationCues({
+          coherence: evoInputs.Coh,
+          complexity: evoInputs.Cx,
+          polarity: evoInputs.Pol,
+          residual: evoInputs.Res,
+          uncertainty: evoInputs.U
+        });
+        setVisualCues(cues);
+
+        const cues2 = engineRef.current.getActiveCues(currentPhase);
+        if (cues2.breath) {
+          const guidance = engineRef.current.generateBreathGuidance(cues2.breath);
+          setBreathGuidance(guidance);
         }
       }, 100);
 
       return () => clearInterval(interval);
     }
-  }, [isPlaying, currentPhase]);
+  }, [isPlaying, currentPhase, evoInputs]);
 
   async function loadSession() {
     await engineRef.current.loadSession(sessionId!);
@@ -63,8 +105,22 @@ export function GuidedSessionPlayer() {
     setSession(loadedSession);
   }
 
+  function updateConsciousnessMetrics() {
+    const breathPhase = Math.sin(Date.now() / 2000);
+
+    setEvoInputs(prev => ({
+      Coh: Math.min(1, prev.Coh + (breathPhase > 0 ? 0.01 : -0.005) + (Math.random() - 0.5) * 0.02),
+      Cx: Math.max(0, Math.min(1, prev.Cx + (Math.random() - 0.5) * 0.01)),
+      Pol: 0.5 + Math.sin(Date.now() / 5000) * 0.2,
+      U: Math.max(0, prev.U - 0.002),
+      Syn: Math.min(1, prev.Syn + (breathPhase > 0 ? 0.005 : 0)),
+      Res: Math.max(0, prev.Res - 0.003)
+    }));
+  }
+
   async function handleStart() {
     await engineRef.current.startSession('demo-user');
+    revelationRef.current = new RevelationManager(sessionId!, 'demo-user');
     startTimeRef.current = Date.now();
     setIsPlaying(true);
   }
@@ -76,8 +132,25 @@ export function GuidedSessionPlayer() {
   function handleReset() {
     startTimeRef.current = Date.now();
     setElapsedTime(0);
+    revelationRef.current = new RevelationManager(sessionId!, 'demo-user');
     setCurrentPhase(RevelationPhase.RECOGNITION);
     setIsPlaying(false);
+    setEvoInputs({ Coh: 0.5, Cx: 0.3, Pol: 0.5, U: 0.5, Syn: 0.4, Res: 0.3 });
+    setFormType('circle');
+  }
+
+  async function captureSigil() {
+    if (!canvasRef.current) return;
+
+    const canvas = await html2canvas(canvasRef.current, {
+      backgroundColor: '#0a0a14',
+      scale: 2
+    });
+
+    const link = document.createElement('a');
+    link.download = `sigil-${currentPhase}-${Date.now()}.png`;
+    link.href = canvas.toDataURL();
+    link.click();
   }
 
   function setupVisualization() {
@@ -94,7 +167,7 @@ export function GuidedSessionPlayer() {
     const camera = new THREE.PerspectiveCamera(75, width / height, 0.1, 1000);
     camera.position.z = 6;
 
-    const renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
+    const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, preserveDrawingBuffer: true });
     renderer.setSize(width, height);
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
     rendererRef.current = renderer;
@@ -118,13 +191,16 @@ export function GuidedSessionPlayer() {
       const elapsed = performance.now() - animStartTime;
       const gaaState = gaaClockRef.current!.tick(elapsed);
 
-      const coherence = breathGuidance?.currentStep === 'inhale' ? 0.7 : 0.5;
+      const elementRatios = { fire: 0.25, earth: 0.25, air: 0.25, water: 0.25 };
+      const evoParams = evolutionRef.current.computeEvoParams(evoInputs, elementRatios);
 
       const params = packEngine.computeParams(
         { region_name: 'Session', lat: 0, lng: 0, timestamp: Date.now() },
-        { individual: coherence, collective: coherence, stillness: 0.6, timestamp: Date.now() },
+        { individual: evoInputs.Coh, collective: evoInputs.Coh, stillness: 0.6, timestamp: Date.now() },
         gaaState,
-        { amplitude: 0.8, frequency: 0.3, phase: 0, waveform: 'sine' }
+        { amplitude: 0.8, frequency: 0.3, phase: 0, waveform: 'sine', hueShift: 0, breathRate: 0.25, tension: evoInputs.Res },
+        evoInputs,
+        { lift: evoParams.lift, merkaba: evoParams.merkaba, formType: formType }
       );
 
       packEngine.runFrameCallbacks(0.016, params);
@@ -149,6 +225,17 @@ export function GuidedSessionPlayer() {
       window.removeEventListener('resize', handleResize);
       renderer.dispose();
     };
+  }
+
+  function getPhaseColor(phase: RevelationPhase): string {
+    const colors: Record<RevelationPhase, string> = {
+      [RevelationPhase.RECOGNITION]: 'cyan',
+      [RevelationPhase.REFLECTION]: 'purple',
+      [RevelationPhase.INTEGRATION]: 'pink',
+      [RevelationPhase.REVELATION]: 'yellow',
+      [RevelationPhase.SEAL]: 'emerald'
+    };
+    return colors[phase];
   }
 
   function getBreathStepLabel(step: string): string {
@@ -192,7 +279,7 @@ export function GuidedSessionPlayer() {
 
       <button
         onClick={() => navigate('/sessions')}
-        className="absolute top-6 left-6 z-50 px-4 py-2 bg-slate-900/60 backdrop-blur-xl border border-slate-700/50 rounded-full text-slate-300 hover:text-white hover:border-cyan-500/50 transition-all flex items-center gap-2"
+        className="absolute top-6 left-6 z-50 px-4 py-2 bg-slate-900/60 backdrop-blur-xl border border-slate-700/50 rounded-full text-slate-300 hover:text-white hover:border-cyan-500/50 transition-all flex items-center gap-2 pointer-events-auto"
       >
         <ArrowLeft className="w-4 h-4" />
         <span className="text-sm font-medium">Back</span>
@@ -228,7 +315,7 @@ export function GuidedSessionPlayer() {
 
             <button
               onClick={handleStart}
-              className="px-12 py-4 bg-gradient-to-r from-cyan-500 to-purple-500 text-white rounded-full font-semibold text-lg hover:scale-105 transition-transform shadow-lg shadow-cyan-500/30"
+              className="px-12 py-4 bg-gradient-to-r from-cyan-500 to-purple-500 text-white rounded-full font-semibold text-lg hover:scale-105 transition-transform shadow-lg shadow-cyan-500/30 pointer-events-auto"
             >
               Begin Session
             </button>
@@ -272,6 +359,73 @@ export function GuidedSessionPlayer() {
         </div>
       )}
 
+      {isPlaying && (
+        <div className="absolute top-24 right-8 z-50 space-y-4 pointer-events-auto">
+          <div className="bg-slate-900/80 backdrop-blur-xl border border-slate-700/50 rounded-3xl p-6 w-96">
+            <div className={`text-xs font-semibold uppercase tracking-wider mb-3 text-${getPhaseColor(currentPhase)}-400`}>
+              Phase {Object.values(RevelationPhase).indexOf(currentPhase) + 1}/5: {currentPhase}
+            </div>
+
+            <div className="text-sm text-white mb-4 leading-relaxed">
+              {phaseTeaching || 'Observe the field...'}
+            </div>
+
+            <div className="space-y-2 mb-4">
+              <div className="flex justify-between text-xs">
+                <span className="text-slate-400">Coherence</span>
+                <span className="text-cyan-400 font-mono">{(evoInputs.Coh * 100).toFixed(0)}%</span>
+              </div>
+              <div className="h-1.5 bg-slate-800 rounded-full">
+                <div className="h-full bg-gradient-to-r from-cyan-500 to-purple-500 rounded-full transition-all duration-300" style={{ width: `${evoInputs.Coh * 100}%` }} />
+              </div>
+            </div>
+
+            <div className="space-y-2 mb-4">
+              <div className="flex justify-between text-xs">
+                <span className="text-slate-400">Complexity</span>
+                <span className="text-purple-400 font-mono">{(evoInputs.Cx * 100).toFixed(0)}%</span>
+              </div>
+              <div className="h-1.5 bg-slate-800 rounded-full">
+                <div className="h-full bg-gradient-to-r from-purple-500 to-pink-500 rounded-full transition-all duration-300" style={{ width: `${evoInputs.Cx * 100}%` }} />
+              </div>
+            </div>
+
+            <div className="text-xs text-slate-500 space-y-1">
+              <div className="flex justify-between">
+                <span>Residual:</span>
+                <span className="font-mono">{(evoInputs.Res * 100).toFixed(0)}%</span>
+              </div>
+              <div className="flex justify-between">
+                <span>Uncertainty:</span>
+                <span className="font-mono">{(evoInputs.U * 100).toFixed(0)}%</span>
+              </div>
+              <div className="flex justify-between">
+                <span>Form:</span>
+                <span className="capitalize">{formType}</span>
+              </div>
+            </div>
+
+            {visualCues.length > 0 && (
+              <div className="mt-4 pt-4 border-t border-slate-700">
+                {visualCues.map((cue, i) => (
+                  <div key={i} className="text-xs text-cyan-400 mb-1">• {cue}</div>
+                ))}
+              </div>
+            )}
+          </div>
+
+          {currentPhase === RevelationPhase.SEAL && (
+            <button
+              onClick={captureSigil}
+              className="w-full px-6 py-3 bg-gradient-to-r from-emerald-500 to-cyan-500 text-white rounded-full font-semibold flex items-center justify-center gap-2 hover:scale-105 transition-transform"
+            >
+              <Download className="w-4 h-4" />
+              Export Sigil
+            </button>
+          )}
+        </div>
+      )}
+
       <div className="absolute bottom-8 left-1/2 -translate-x-1/2 z-50 pointer-events-auto">
         <div className="bg-slate-900/60 backdrop-blur-xl border border-slate-700/50 rounded-full px-8 py-4">
           <div className="flex items-center gap-8">
@@ -293,10 +447,6 @@ export function GuidedSessionPlayer() {
               >
                 <RotateCcw className="w-5 h-5" />
               </button>
-            </div>
-
-            <div className="text-sm text-slate-400">
-              Phase: <span className="text-cyan-400 capitalize">{currentPhase}</span>
             </div>
           </div>
         </div>

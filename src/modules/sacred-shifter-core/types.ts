@@ -92,4 +92,14 @@ export interface ResonanceParams {
   uBreathRate: number;
   uHarmonics: number[];
   uSeed: [number, number, number];
+
+  uCoh: number;
+  uCx: number;
+  uPol: number;
+  uU: number;
+  uSyn: number;
+  uRes: number;
+  uFormType: string;
+  uLift: number;
+  uMerkaba: boolean;
 }

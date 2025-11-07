@@ -184,7 +184,14 @@ export class PackEngine {
     return factory ? factory() : undefined;
   }
 
-  computeParams(seed: RegionSeed, coherence: CoherenceSample, gaa: GAAState, envelope: SonicEnvelope): ResonanceParams {
+  computeParams(
+    seed: RegionSeed,
+    coherence: CoherenceSample,
+    gaa: GAAState,
+    envelope: SonicEnvelope,
+    evoInputs?: { Coh: number; Cx: number; Pol: number; U: number; Syn: number; Res: number },
+    evoParams?: { lift: number; merkaba: boolean; formType: string }
+  ): ResonanceParams {
     const baseParams: ResonanceParams = {
       uTime: Date.now() / 1000,
       uCoherence: coherence.collective,
@@ -195,7 +202,17 @@ export class PackEngine {
       uAmplitude: envelope.amplitude,
       uBreathRate: envelope.breathRate,
       uHarmonics: gaa.harmonics,
-      uSeed: [seed.lat, seed.lng, seed.timestamp]
+      uSeed: [seed.lat, seed.lng, seed.timestamp],
+
+      uCoh: evoInputs?.Coh ?? coherence.collective,
+      uCx: evoInputs?.Cx ?? 0.5,
+      uPol: evoInputs?.Pol ?? 0.5,
+      uU: evoInputs?.U ?? 0.5,
+      uSyn: evoInputs?.Syn ?? 0.5,
+      uRes: evoInputs?.Res ?? 0.3,
+      uFormType: evoParams?.formType ?? 'circle',
+      uLift: evoParams?.lift ?? 0,
+      uMerkaba: evoParams?.merkaba ?? false
     };
 
     if (this.paramMapper) {
