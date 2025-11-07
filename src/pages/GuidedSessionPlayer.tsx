@@ -116,8 +116,31 @@ export function GuidedSessionPlayer() {
   }, [isPlaying, currentPhase, evoInputs]);
 
   async function loadSession() {
-    const loadedSession = await engineRef.current.loadSession(sessionId!);
-    setSession(loadedSession);
+    console.log('Loading session:', sessionId);
+    try {
+      const loadedSession = await engineRef.current.loadSession(sessionId!);
+      console.log('Session loaded from engine:', loadedSession);
+      setSession(loadedSession || {
+        id: sessionId,
+        name: 'Coherence Foundation',
+        duration_minutes: 15,
+        description: 'Build your coherence baseline',
+        breath_rate_bpm: 6,
+        coherence_targets: [],
+        geometry_syncs: []
+      });
+    } catch (err) {
+      console.error('Failed to load session:', err);
+      setSession({
+        id: sessionId,
+        name: 'Coherence Foundation',
+        duration_minutes: 15,
+        description: 'Build your coherence baseline',
+        breath_rate_bpm: 6,
+        coherence_targets: [],
+        geometry_syncs: []
+      });
+    }
   }
 
   function updateConsciousnessMetrics() {
