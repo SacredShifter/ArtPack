@@ -44,7 +44,12 @@ export function GuidedSessionPlayer() {
 
   useEffect(() => {
     loadSession();
-    setupVisualization();
+    // Wait for canvas to be rendered before setting up visualization
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        setupVisualization();
+      });
+    });
   }, [sessionId]);
 
   useEffect(() => {

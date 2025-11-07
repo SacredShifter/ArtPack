@@ -217,18 +217,25 @@ export class RevelationManager {
     triggerMetric?: string,
     triggerValue?: number
   ) {
-    const { error } = await supabase.from('revelation_phases').insert({
-      session_id: this.sessionId,
-      user_id: this.userId,
-      phase_name: phase,
-      entered_at: new Date().toISOString(),
-      trigger_metric: triggerMetric,
-      trigger_value: triggerValue,
-      teaching_shown: this.getTeachingForPhase(phase, {}).caption
-    });
+    // Only record if userId is provided (optional feature)
+    if (!this.userId) return;
 
-    if (error) {
-      console.error('Failed to record phase entry:', error);
+    try {
+      const { error } = await supabase.from('revelation_phases').insert({
+        session_id: this.sessionId,
+        user_id: this.userId,
+        phase_name: phase,
+        entered_at: new Date().toISOString(),
+        trigger_metric: triggerMetric,
+        trigger_value: triggerValue,
+        teaching_shown: this.getTeachingForPhase(phase, {}).caption
+      });
+
+      if (error) {
+        console.log('Phase tracking disabled (no auth)');
+      }
+    } catch (err) {
+      // Silently fail - phase tracking is optional
     }
   }
 

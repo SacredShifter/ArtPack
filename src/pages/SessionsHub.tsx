@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { GuidedSessionEngine } from '../modules/sacred-shifter-core/GuidedSessionEngine';
 import type { GuidedSession } from '../modules/sacred-shifter-core/GuidedSessionEngine';
-import { Wind, Target, Clock, TrendingUp } from 'lucide-react';
+import { Wind, Target, Clock, TrendingUp, BookOpen, Calendar } from 'lucide-react';
 
 export function SessionsHub() {
   const navigate = useNavigate();
@@ -71,6 +71,23 @@ export function SessionsHub() {
       </div>
 
       <div className="relative z-10 container mx-auto px-8 py-16">
+        <div className="flex justify-end gap-4 mb-8">
+          <button
+            onClick={() => navigate('/events')}
+            className="px-6 py-3 bg-slate-900/60 backdrop-blur-xl border border-slate-700/50 rounded-full text-slate-300 hover:text-white hover:border-purple-500/50 transition-all flex items-center gap-2"
+          >
+            <Calendar className="w-4 h-4" />
+            <span className="text-sm font-medium">Collective Events</span>
+          </button>
+          <button
+            onClick={() => navigate('/docs')}
+            className="px-6 py-3 bg-slate-900/60 backdrop-blur-xl border border-slate-700/50 rounded-full text-slate-300 hover:text-white hover:border-cyan-500/50 transition-all flex items-center gap-2"
+          >
+            <BookOpen className="w-4 h-4" />
+            <span className="text-sm font-medium">Documentation</span>
+          </button>
+        </div>
+
         <div className="text-center mb-16">
           <div className="inline-flex items-center gap-3 mb-4">
             <Wind className="w-12 h-12 text-cyan-400" />
