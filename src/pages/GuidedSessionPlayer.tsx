@@ -173,11 +173,25 @@ export function GuidedSessionPlayer() {
 
     gaaClockRef.current = new GAAClock(432, [1, 1.5, 2, 3, 4]);
 
+    // Create fallback geometry while pack loads
+    const geometry = new THREE.TorusGeometry(1.5, 0.3, 32, 100);
+    const material = new THREE.MeshBasicMaterial({
+      color: 0x06b6d4,
+      wireframe: true,
+      transparent: true,
+      opacity: 0.6
+    });
+    const mesh = new THREE.Mesh(geometry, material);
+    scene.add(mesh);
+
     packEngine.loadPack('/artpacks/CollectiveMandala/manifest.json').then(() => {
       const node = packEngine.createNode('primary');
       if (node) {
+        scene.remove(mesh);
         scene.add(node);
       }
+    }).catch(err => {
+      console.log('Art pack load failed, using fallback geometry:', err);
     });
 
     let animStartTime = performance.now();
@@ -185,10 +199,14 @@ export function GuidedSessionPlayer() {
     const animate = () => {
       requestAnimationFrame(animate);
 
-      if (!isPlaying) return;
-
       const elapsed = performance.now() - animStartTime;
       const gaaState = gaaClockRef.current!.tick(elapsed);
+
+      // Rotate fallback torus
+      if (scene.children.includes(mesh)) {
+        mesh.rotation.x = elapsed * 0.0003;
+        mesh.rotation.y = elapsed * 0.0005;
+      }
 
       const elementRatios = { fire: 0.25, earth: 0.25, air: 0.25, water: 0.25 };
       const evoParams = evolutionRef.current.computeEvoParams(evoInputs, elementRatios);
@@ -197,7 +215,7 @@ export function GuidedSessionPlayer() {
         { region_name: 'Session', lat: 0, lng: 0, timestamp: Date.now() },
         { individual: evoInputs.Coh, collective: evoInputs.Coh, stillness: 0.6, timestamp: Date.now() },
         gaaState,
-        { amplitude: 0.8, frequency: 0.3, phase: 0, waveform: 'sine', hueShift: 0, breathRate: 0.25, tension: evoInputs.Res },
+        { amplitude: 0.8, hueShift: 0, breathRate: 0.25, tension: evoInputs.Res },
         evoInputs,
         { lift: evoParams.lift, merkaba: evoParams.merkaba, formType: formType }
       );
