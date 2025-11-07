@@ -1,0 +1,47 @@
+{
+  "id": "cosmic_mandala",
+  "name": "Cosmic Mandala",
+  "version": "1.0.0",
+  "author": "Sacred Shifter Core",
+  "description": "Full metaphysical integration: Birth charts, planetary transits, GAA harmonics, geographic resonance, and synastry connections visualized as living sacred geometry. Each person's unique cosmic signature contributes to the emergent collective field.",
+  "esm_url": "index.js",
+  "signature": "authentic_cosmic_weaving",
+  "tags": ["astrology", "sacred-geometry", "cosmic", "synastry", "transits", "location", "collective-field"],
+  "capabilities": {
+    "max_participants": 1000,
+    "supports_birth_charts": true,
+    "supports_location_data": true,
+    "supports_synastry": true,
+    "supports_transits": true,
+    "gaa_integrated": true,
+    "multidimensional": true
+  },
+  "visual_modes": {
+    "individual": "12-petal mandala with Flower of Life geometry, house placements, and planetary transits",
+    "small_group": "Rotating hexagonal glyphs colored by Sun sign, sized by element intensity, connected via synastry lines with Vesica Piscis sacred geometry",
+    "large_group": "Luminous points with depth halos showing location resonance and multidimensional coherence"
+  },
+  "metaphysical_encodings": {
+    "sun_sign": "Primary color hue (0-360°)",
+    "moon_sign": "Luminosity and emotional depth",
+    "rising_sign": "Rotation speed and energetic presentation",
+    "element_balance": "Glyph size and intensity",
+    "planetary_positions": "Individual modulations per planet",
+    "aspects": "Connection line colors and strength",
+    "houses": "Spatial positioning influence",
+    "birth_location": "Geographic harmonic baseline",
+    "current_location": "Real-time resonance with region",
+    "transits": "Background planetary overlay rings",
+    "moon_phase": "Center glow lunar modulation",
+    "gaa_alignment": "Personal frequency sync to 432Hz",
+    "synastry": "Vesica Piscis connections between compatible souls",
+    "collective_depth": "Emergent field multidimensional coherence"
+  },
+  "sacred_geometry": [
+    "Flower of Life",
+    "Vesica Piscis",
+    "Golden Angle Spiral (137.508°)",
+    "12-Fold Symmetry",
+    "Hexagonal Tessellation"
+  ]
+}
