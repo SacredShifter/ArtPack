@@ -75,6 +75,12 @@ export function DemoMode() {
   };
 
   useEffect(() => {
+    packEngine.loadPack('/artpacks/CollectiveMandala/manifest.json').catch(err => {
+      console.error('Failed to load art pack:', err);
+    });
+  }, []);
+
+  useEffect(() => {
     let count = 1;
     switch (mode) {
       case 'individual': count = 1; break;
