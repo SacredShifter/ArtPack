@@ -1,0 +1,17 @@
+{
+  "id": "cosmic-blueprint",
+  "name": "Cosmic Blueprint",
+  "version": "1.0.0",
+  "description": "Full astrological encoding: natal charts, planetary positions, aspects, synastry, and current transits create a living celestial mandala.",
+  "author": "Sacred Shifter Core - Astrological",
+  "esm_url": "index.js",
+  "minEngine": "1.0.0",
+  "safety": {
+    "maxStrobeHz": 2,
+    "maxBrightness": 0.85,
+    "maxSaturation": 0.9,
+    "photosensitiveWarning": false
+  },
+  "essenceLabels": ["astrology", "cosmic", "natal-chart", "zodiac", "planetary", "synastry"],
+  "telosAlignment": ["self-discovery", "connection", "destiny", "cosmic-consciousness"]
+}

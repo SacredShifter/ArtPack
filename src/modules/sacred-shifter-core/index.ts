@@ -11,6 +11,10 @@ export { ParticipantEncoder } from './ParticipantEncoder';
 export { JoinSessionPage } from './JoinSessionPage';
 export { CreateSessionPage } from './CreateSessionPage';
 export { DemoMode } from './DemoMode';
+export { AstrologicalCalculator } from './AstrologicalCalculator';
+export { AstrologicalEncoder } from './AstrologicalEncoder';
+export { BirthDataInput } from './BirthDataInput';
+export { NatalChartPreview } from './NatalChartPreview';
 
 export type {
   RegionSeed,
@@ -35,3 +39,16 @@ export type {
   CollectiveSessionData,
   ParticipantContribution
 } from './CollectiveSession';
+
+export type {
+  BirthData,
+  ZodiacSign,
+  PlanetPosition,
+  NatalChart,
+  Aspect,
+  AstrologicalSignature
+} from './AstrologicalCalculator';
+
+export type {
+  AstrologicalParticipantSignature
+} from './AstrologicalEncoder';
