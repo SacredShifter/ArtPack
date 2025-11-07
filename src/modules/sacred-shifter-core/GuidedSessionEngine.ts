@@ -26,7 +26,44 @@ export interface GuidedSession {
 
 export class GuidedSessionEngine {
   static async getPublicSessions(): Promise<GuidedSession[]> {
-    return [];
+    return [
+      {
+        id: 'demo-1',
+        title: 'Coherence Foundation',
+        description: 'Build basic breath-heart coherence and learn to observe the field',
+        duration_minutes: 15,
+        difficulty: 'beginner',
+        intention: 'Establish baseline coherence',
+        breath_patterns: [],
+        sound_cues: [],
+        movement_sequences: [],
+        geometry_syncs: []
+      },
+      {
+        id: 'demo-2',
+        title: 'Shadow Integration Flow',
+        description: 'Work with residual tension through breath and movement',
+        duration_minutes: 25,
+        difficulty: 'intermediate',
+        intention: 'Integrate shadow aspects',
+        breath_patterns: [],
+        sound_cues: [],
+        movement_sequences: [],
+        geometry_syncs: []
+      },
+      {
+        id: 'demo-3',
+        title: 'Transcendent Stillness',
+        description: 'Deep meditation with sacred geometry guidance',
+        duration_minutes: 45,
+        difficulty: 'advanced',
+        intention: 'Touch the void',
+        breath_patterns: [],
+        sound_cues: [],
+        movement_sequences: [],
+        geometry_syncs: []
+      }
+    ];
   }
 
   static async createSession(session: Omit<GuidedSession, 'id'>, creatorId: string): Promise<string | null> {
@@ -50,7 +87,8 @@ export class GuidedSessionEngine {
   }
 
   async loadSession(sessionId: string): Promise<GuidedSession | null> {
-    return null;
+    const sessions = await GuidedSessionEngine.getPublicSessions();
+    return sessions.find(s => s.id === sessionId) || sessions[0];
   }
 
   async startSession(userId: string): Promise<string | null> {

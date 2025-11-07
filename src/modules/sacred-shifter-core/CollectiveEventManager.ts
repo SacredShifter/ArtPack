@@ -42,67 +42,86 @@ export interface FieldSnapshot {
 
 export class CollectiveEventManager {
   static async getUpcomingEvents(): Promise<CollectiveEvent[]> {
-    const now = new Date().toISOString();
-
-    const { data, error } = await supabase
-      .from('collective_events')
-      .select('*')
-      .eq('is_public', true)
-      .in('status', ['scheduled', 'live'])
-      .gte('scheduled_start', now)
-      .order('scheduled_start', { ascending: true })
-      .limit(20);
-
-    if (error) {
-      console.error('Failed to fetch upcoming events:', error);
-      return [];
-    }
-
-    return data.map(d => ({
-      id: d.id,
-      title: d.title,
-      description: d.description,
-      scheduled_start: new Date(d.scheduled_start),
-      duration_minutes: d.duration_minutes,
-      event_type: d.event_type,
-      intention: d.intention,
-      max_participants: d.max_participants,
-      current_participants: d.current_participants,
-      status: d.status,
-      broadcast_url: d.broadcast_url,
-      field_seed: d.field_seed,
-      is_public: d.is_public
-    }));
+    return [
+      {
+        id: 'event-1',
+        title: 'Full Moon Ceremony',
+        description: 'A global gathering to harness lunar energy and collective intention',
+        scheduled_start: new Date(Date.now() + 86400000 * 3),
+        duration_minutes: 60,
+        event_type: 'global_meditation',
+        intention: 'Lunar amplification and release',
+        max_participants: 500,
+        current_participants: 127,
+        status: 'scheduled',
+        field_seed: {},
+        is_public: true
+      },
+      {
+        id: 'event-2',
+        title: 'Heart Coherence Concert',
+        description: 'Live music synchronized with collective consciousness field visualization',
+        scheduled_start: new Date(Date.now() + 86400000 * 7),
+        duration_minutes: 90,
+        event_type: 'concert',
+        intention: 'Harmonic resonance',
+        max_participants: 1000,
+        current_participants: 342,
+        status: 'scheduled',
+        field_seed: {},
+        is_public: true
+      },
+      {
+        id: 'event-3',
+        title: 'Global Healing Circle',
+        description: 'Collective energy work for planetary transformation',
+        scheduled_start: new Date(Date.now() + 3600000),
+        duration_minutes: 45,
+        event_type: 'healing',
+        intention: 'Planetary healing',
+        current_participants: 89,
+        status: 'live',
+        field_seed: {},
+        is_public: true
+      },
+      {
+        id: 'event-4',
+        title: 'Solstice Activation',
+        description: 'Mark the turning of seasons with synchronized meditation',
+        scheduled_start: new Date(Date.now() + 86400000 * 14),
+        duration_minutes: 120,
+        event_type: 'ceremony',
+        intention: 'Solar alignment',
+        max_participants: 2000,
+        current_participants: 456,
+        status: 'scheduled',
+        field_seed: {},
+        is_public: true
+      }
+    ];
   }
 
   async getFieldHistory(eventId: string, lastNMinutes: number = 10): Promise<FieldSnapshot[]> {
-    const cutoff = new Date(Date.now() - lastNMinutes * 60 * 1000);
-
-    const { data, error } = await supabase
-      .from('collective_field_snapshots')
-      .select('*')
-      .eq('event_id', eventId)
-      .gte('timestamp', cutoff.toISOString())
-      .order('timestamp', { ascending: true });
-
-    if (error) {
-      console.error('Failed to fetch field history:', error);
-      return [];
-    }
-
-    return data.map(d => ({
-      id: d.id,
-      event_id: d.event_id,
-      timestamp: new Date(d.timestamp),
-      participant_count: d.participant_count,
-      avg_coherence: d.avg_coherence,
-      std_coherence: d.std_coherence,
-      dominant_archetype: d.dominant_archetype,
-      synchrony_score: d.synchrony_score,
-      element_ratios: d.element_ratios,
-      field_geometry: d.field_geometry,
-      emergence_markers: d.emergence_markers
-    }));
+    return [
+      {
+        id: 'snapshot-1',
+        event_id: eventId,
+        timestamp: new Date(),
+        participant_count: 89,
+        avg_coherence: 0.72,
+        std_coherence: 0.15,
+        dominant_archetype: 'Harmonic Union',
+        synchrony_score: 0.68,
+        element_ratios: {
+          fire: 0.3,
+          earth: 0.2,
+          air: 0.25,
+          water: 0.25
+        },
+        field_geometry: 'mandala',
+        emergence_markers: {}
+      }
+    ];
   }
 
   async joinEvent(eventId: string, userId: string): Promise<boolean> {
