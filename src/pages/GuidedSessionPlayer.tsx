@@ -100,8 +100,7 @@ export function GuidedSessionPlayer() {
   }, [isPlaying, currentPhase, evoInputs]);
 
   async function loadSession() {
-    await engineRef.current.loadSession(sessionId!);
-    const loadedSession = engineRef.current['currentSession'];
+    const loadedSession = await engineRef.current.loadSession(sessionId!);
     setSession(loadedSession);
   }
 
