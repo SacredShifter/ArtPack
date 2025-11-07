@@ -190,8 +190,10 @@ export function GuidedSessionPlayer() {
     if (!canvasRef.current) return;
 
     const canvas = canvasRef.current;
-    const width = canvas.clientWidth;
-    const height = canvas.clientHeight;
+    const width = canvas.clientWidth || window.innerWidth;
+    const height = canvas.clientHeight || window.innerHeight;
+
+    console.log('Setting up visualization:', { width, height });
 
     const scene = new THREE.Scene();
     scene.background = new THREE.Color(0x0a0a14);
@@ -205,23 +207,86 @@ export function GuidedSessionPlayer() {
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
     rendererRef.current = renderer;
 
+    console.log('Renderer created:', renderer);
+
     gaaClockRef.current = new GAAClock(432, [1, 1.5, 2, 3, 4]);
 
-    // Create fallback geometry while pack loads
-    const geometry = new THREE.TorusGeometry(1.5, 0.3, 32, 100);
-    const material = new THREE.MeshBasicMaterial({
+    // Create multiple fallback geometries for rich visual
+    const group = new THREE.Group();
+
+    // Main torus
+    const torusGeom = new THREE.TorusGeometry(2, 0.4, 32, 100);
+    const torusMat = new THREE.MeshStandardMaterial({
       color: 0x06b6d4,
+      emissive: 0x06b6d4,
+      emissiveIntensity: 0.3,
+      wireframe: false,
+      metalness: 0.8,
+      roughness: 0.2
+    });
+    const torus = new THREE.Mesh(torusGeom, torusMat);
+    group.add(torus);
+
+    // Inner sphere
+    const sphereGeom = new THREE.SphereGeometry(0.8, 32, 32);
+    const sphereMat = new THREE.MeshStandardMaterial({
+      color: 0x8b5cf6,
+      emissive: 0x8b5cf6,
+      emissiveIntensity: 0.5,
       wireframe: true,
       transparent: true,
       opacity: 0.6
     });
-    const mesh = new THREE.Mesh(geometry, material);
-    scene.add(mesh);
+    const sphere = new THREE.Mesh(sphereGeom, sphereMat);
+    group.add(sphere);
+
+    // Outer ring particles
+    const particlesGeom = new THREE.BufferGeometry();
+    const particleCount = 200;
+    const positions = new Float32Array(particleCount * 3);
+    for (let i = 0; i < particleCount; i++) {
+      const angle = (i / particleCount) * Math.PI * 2;
+      const radius = 3 + Math.random() * 0.5;
+      positions[i * 3] = Math.cos(angle) * radius;
+      positions[i * 3 + 1] = Math.sin(angle) * radius;
+      positions[i * 3 + 2] = (Math.random() - 0.5) * 0.5;
+    }
+    particlesGeom.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+    const particlesMat = new THREE.PointsMaterial({
+      color: 0xec4899,
+      size: 0.05,
+      transparent: true,
+      opacity: 0.8
+    });
+    const particles = new THREE.Points(particlesGeom, particlesMat);
+    group.add(particles);
+
+    scene.add(group);
+
+    // Add strong lighting
+    const ambientLight = new THREE.AmbientLight(0xffffff, 0.4);
+    scene.add(ambientLight);
+
+    const keyLight = new THREE.DirectionalLight(0x06b6d4, 1);
+    keyLight.position.set(5, 5, 5);
+    scene.add(keyLight);
+
+    const fillLight = new THREE.DirectionalLight(0x8b5cf6, 0.5);
+    fillLight.position.set(-5, -5, 5);
+    scene.add(fillLight);
+
+    const backLight = new THREE.PointLight(0xec4899, 0.8, 50);
+    backLight.position.set(0, 0, -5);
+    scene.add(backLight);
+
+    console.log('Rich fallback geometry added to scene');
 
     packEngine.loadPack('/artpacks/CollectiveMandala/manifest.json').then(() => {
+      console.log('Art pack loaded successfully');
       const node = packEngine.createNode('primary');
       if (node) {
-        scene.remove(mesh);
+        console.log('Art pack node created, replacing fallback');
+        scene.remove(group);
         scene.add(node);
       }
     }).catch(err => {
@@ -236,10 +301,21 @@ export function GuidedSessionPlayer() {
       const elapsed = performance.now() - animStartTime;
       const gaaState = gaaClockRef.current!.tick(elapsed);
 
-      // Rotate fallback torus
-      if (scene.children.includes(mesh)) {
-        mesh.rotation.x = elapsed * 0.0003;
-        mesh.rotation.y = elapsed * 0.0005;
+      // Animate fallback group
+      if (scene.children.includes(group)) {
+        group.rotation.x = elapsed * 0.0002;
+        group.rotation.y = elapsed * 0.0004;
+
+        // Pulse the sphere
+        const pulse = Math.sin(elapsed * 0.002) * 0.2 + 1;
+        sphere.scale.set(pulse, pulse, pulse);
+
+        // Rotate particles
+        particles.rotation.z = elapsed * 0.0003;
+
+        // Update colors based on metrics
+        (torusMat as THREE.MeshStandardMaterial).emissiveIntensity = 0.3 + evoInputs.Coh * 0.5;
+        (sphereMat as THREE.MeshStandardMaterial).emissiveIntensity = 0.3 + evoInputs.Cx * 0.7;
       }
 
       const elementRatios = { fire: 0.25, earth: 0.25, air: 0.25, water: 0.25 };
