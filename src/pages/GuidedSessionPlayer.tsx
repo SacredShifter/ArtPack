@@ -7,7 +7,7 @@ import { GuidedSessionEngine } from '../modules/sacred-shifter-core/GuidedSessio
 import type { BreathCue } from '../modules/sacred-shifter-core/GuidedSessionEngine';
 import { RevelationManager, RevelationPhase } from '../modules/sacred-shifter-core/RevelationManager';
 import { EvolutionEngine } from '../modules/mirror-unseen/evolution';
-import { ArrowLeft, Play, Pause, RotateCcw, Download } from 'lucide-react';
+import { ArrowLeft, Play, Pause, RotateCcw, Download, Maximize, Minimize } from 'lucide-react';
 import html2canvas from 'html2canvas';
 
 export function GuidedSessionPlayer() {
@@ -16,6 +16,7 @@ export function GuidedSessionPlayer() {
 
   const [session, setSession] = useState<any>(null);
   const [isPlaying, setIsPlaying] = useState(false);
+  const [isFullscreen, setIsFullscreen] = useState(false);
   const [currentPhase, setCurrentPhase] = useState<RevelationPhase>(RevelationPhase.RECOGNITION);
   const [phaseTeaching, setPhaseTeaching] = useState<string>('');
   const [breathGuidance, setBreathGuidance] = useState<any>(null);
@@ -23,6 +24,7 @@ export function GuidedSessionPlayer() {
   const [narration, setNarration] = useState<string>('');
   const [formType, setFormType] = useState<string>('circle');
   const [visualCues, setVisualCues] = useState<string[]>([]);
+  const containerRef = useRef<HTMLDivElement>(null);
 
   const [evoInputs, setEvoInputs] = useState({
     Coh: 0.5,
@@ -50,6 +52,15 @@ export function GuidedSessionPlayer() {
         setupVisualization();
       });
     });
+
+    // Listen for fullscreen changes
+    const handleFullscreenChange = () => {
+      setIsFullscreen(!!document.fullscreenElement);
+    };
+    document.addEventListener('fullscreenchange', handleFullscreenChange);
+    return () => {
+      document.removeEventListener('fullscreenchange', handleFullscreenChange);
+    };
   }, [sessionId]);
 
   useEffect(() => {
@@ -141,6 +152,24 @@ export function GuidedSessionPlayer() {
     setIsPlaying(false);
     setEvoInputs({ Coh: 0.5, Cx: 0.3, Pol: 0.5, U: 0.5, Syn: 0.4, Res: 0.3 });
     setFormType('circle');
+  }
+
+  async function toggleFullscreen() {
+    if (!containerRef.current) return;
+
+    if (!document.fullscreenElement) {
+      try {
+        await containerRef.current.requestFullscreen();
+      } catch (err) {
+        console.error('Failed to enter fullscreen:', err);
+      }
+    } else {
+      try {
+        await document.exitFullscreen();
+      } catch (err) {
+        console.error('Failed to exit fullscreen:', err);
+      }
+    }
   }
 
   async function captureSigil() {
@@ -285,7 +314,7 @@ export function GuidedSessionPlayer() {
   }
 
   return (
-    <div className="relative w-screen h-screen overflow-hidden bg-[#0a0a14]">
+    <div ref={containerRef} className="relative w-screen h-screen overflow-hidden bg-[#0a0a14]">
       <canvas ref={canvasRef} className="absolute inset-0 w-full h-full" />
 
       <div className="absolute inset-0 pointer-events-none">
@@ -468,6 +497,14 @@ export function GuidedSessionPlayer() {
                 className="w-12 h-12 rounded-full bg-slate-700/50 text-slate-300 hover:text-white hover:bg-slate-700 flex items-center justify-center transition-all"
               >
                 <RotateCcw className="w-5 h-5" />
+              </button>
+
+              <button
+                onClick={toggleFullscreen}
+                className="w-12 h-12 rounded-full bg-slate-700/50 text-slate-300 hover:text-white hover:bg-slate-700 flex items-center justify-center transition-all"
+                title={isFullscreen ? "Exit Fullscreen" : "Enter Fullscreen"}
+              >
+                {isFullscreen ? <Minimize className="w-5 h-5" /> : <Maximize className="w-5 h-5" />}
               </button>
             </div>
           </div>
