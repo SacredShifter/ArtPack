@@ -1,0 +1,17 @@
+{
+  "id": "collective-mandala",
+  "name": "Collective Mandala",
+  "version": "1.0.0",
+  "description": "Each participant becomes a petal in a living, breathing mandala. Small groups (2-50) show individual glyphs, large groups create particle fields.",
+  "author": "Sacred Shifter Core",
+  "esm_url": "index.js",
+  "minEngine": "1.0.0",
+  "safety": {
+    "maxStrobeHz": 2,
+    "maxBrightness": 0.8,
+    "maxSaturation": 0.85,
+    "photosensitiveWarning": false
+  },
+  "essenceLabels": ["collective", "mandala", "unity", "sacred-geometry"],
+  "telosAlignment": ["coherence", "connection", "beauty"]
+}
