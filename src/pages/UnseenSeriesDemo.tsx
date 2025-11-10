@@ -1,6 +1,8 @@
 import { useState, useEffect, useRef } from 'react';
 import { Play, Pause, SkipForward, Sliders, ChevronDown, ChevronUp, Camera } from 'lucide-react';
 import * as THREE from 'three';
+import { generateKnowledgeCard } from '../modules/artpacks/PackKnowledge';
+import { KnowledgeCardCompositor } from '../modules/artpacks/KnowledgeCardCompositor';
 
 interface Pack {
   id: string;
@@ -88,6 +90,7 @@ export default function UnseenSeriesDemo() {
   const [gain, setGain] = useState(0.5);
   const [phase, setPhase] = useState(0);
   const [capturing, setCapturing] = useState(false);
+  const [includeKnowledgeCard, setIncludeKnowledgeCard] = useState(true);
 
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const sceneRef = useRef<THREE.Scene | null>(null);
@@ -293,14 +296,37 @@ export default function UnseenSeriesDemo() {
       await new Promise(resolve => setTimeout(resolve, 100));
 
       const canvas = canvasRef.current!;
-      const blob = await new Promise<Blob>((resolve) => {
-        canvas.toBlob((blob) => resolve(blob!), 'image/png', 1.0);
-      });
+      let blob: Blob;
+
+      if (includeKnowledgeCard) {
+        // Generate knowledge card text
+        const knowledgeText = generateKnowledgeCard(
+          currentPack.id,
+          coherence * 100,
+          stillness * 100,
+          Date.now()
+        );
+
+        // Composite knowledge card onto canvas
+        blob = await KnowledgeCardCompositor.composite(canvas, {
+          knowledgeText,
+          overlayOpacity: 0.92,
+          padding: 40,
+          fontSize: 14,
+          lineHeight: 1.6
+        });
+      } else {
+        // Capture clean image without knowledge card
+        blob = await new Promise<Blob>((resolve) => {
+          canvas.toBlob((blob) => resolve(blob!), 'image/png', 1.0);
+        });
+      }
 
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
-      a.download = `unseen-${currentPack.id}-${Date.now()}.png`;
+      const suffix = includeKnowledgeCard ? 'artifact' : 'clean';
+      a.download = `unseen-${currentPack.id}-${suffix}-${Date.now()}.png`;
       document.body.appendChild(a);
       a.click();
       document.body.removeChild(a);
@@ -398,6 +424,18 @@ export default function UnseenSeriesDemo() {
                   <Sliders className="w-4 h-4" />
                 </button>
               </div>
+
+              <label className="flex items-center gap-3 px-3 py-2 bg-slate-800/50 rounded-lg cursor-pointer hover:bg-slate-800/70 transition-colors">
+                <input
+                  type="checkbox"
+                  checked={includeKnowledgeCard}
+                  onChange={(e) => setIncludeKnowledgeCard(e.target.checked)}
+                  className="w-4 h-4 rounded border-slate-600 bg-slate-700 text-purple-600 focus:ring-purple-500 focus:ring-offset-slate-900"
+                />
+                <span className="text-sm text-slate-300">
+                  Include Knowledge Card
+                </span>
+              </label>
 
               <button
                 onClick={captureSnapshot}
