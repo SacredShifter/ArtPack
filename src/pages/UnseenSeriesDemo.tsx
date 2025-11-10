@@ -115,6 +115,7 @@ export default function UnseenSeriesDemo() {
       canvas: canvasRef.current,
       antialias: true,
       alpha: true,
+      preserveDrawingBuffer: true,
     });
     renderer.setSize(window.innerWidth, window.innerHeight);
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
@@ -280,14 +281,20 @@ export default function UnseenSeriesDemo() {
   };
 
   const captureSnapshot = async () => {
-    if (!canvasRef.current) return;
+    if (!rendererRef.current || !sceneRef.current || !cameraRef.current) return;
 
     setCapturing(true);
 
     try {
-      const canvas = canvasRef.current;
+      // Force a fresh render
+      rendererRef.current.render(sceneRef.current, cameraRef.current);
+
+      // Wait a frame to ensure render is complete
+      await new Promise(resolve => setTimeout(resolve, 100));
+
+      const canvas = canvasRef.current!;
       const blob = await new Promise<Blob>((resolve) => {
-        canvas.toBlob((blob) => resolve(blob!), 'image/png');
+        canvas.toBlob((blob) => resolve(blob!), 'image/png', 1.0);
       });
 
       const url = URL.createObjectURL(blob);
