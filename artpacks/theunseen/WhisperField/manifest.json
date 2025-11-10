@@ -1,0 +1,41 @@
+{
+  "id": "whisper-field",
+  "name": "Whisper Field",
+  "version": "1.0.0",
+  "author": "Sacred Shifter Collective",
+  "description": "The faintest movement of unseen currents. Ultra-soft flow fields drift like breathing fog inside a cosmic cavern. Almost not there, yet undeniably present. This is the first stirring of consciousness emerging from the void.",
+  "esm_url": "index.js",
+  "minEngine": "1.0.0",
+  "series": {
+    "id": "the-unseen",
+    "name": "The Unseen Series",
+    "order": 2,
+    "wave": 1
+  },
+  "tags": ["flow", "subtle", "atmospheric", "meditative", "soft", "gaseous", "unseen"],
+  "telos": ["support-meditative-states", "facilitate-transcendence"],
+  "essenceLabels": ["subtle", "flowing", "reactive", "meditative"],
+  "motion_profile": "flowing",
+  "power_rating": 2,
+  "aesthetic_coherence_score": 1.0,
+  "color_palette": {
+    "primary": "#0a0a0f",
+    "secondary": "#151520",
+    "accent": "#2a2a3a",
+    "highlight": "#4a4a6a"
+  },
+  "safety": {
+    "maxStrobeHz": 0.5,
+    "photosensitiveWarning": false,
+    "lowSensoryFriendly": true,
+    "maxBrightness": 0.5,
+    "maxSaturation": 0.4
+  },
+  "performance": {
+    "targetFPS": 60,
+    "gpuIntensity": "low",
+    "hasLOD": true,
+    "hasFallback": true
+  },
+  "metaphysicalNotes": "Whisper Field represents the first tremor of manifestation. The void begins to breathe. Coherence makes the invisible visible. Stillness amplifies the whispers."
+}

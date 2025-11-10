@@ -1,0 +1,41 @@
+{
+  "id": "eternal-void-unseen",
+  "name": "Eternal Void - The Unseen",
+  "version": "2.0.0",
+  "author": "Sacred Shifter Collective",
+  "description": "The pregnant darkness. Empty. Atmospheric. Dark stillness. This is your starting point for the entire series. Confrontation with the infinite emptiness that precedes form. Black becomes luminous. Silence becomes deafening. Surrender to the nothing that contains everything.",
+  "esm_url": "index.js",
+  "minEngine": "1.0.0",
+  "series": {
+    "id": "the-unseen",
+    "name": "The Unseen Series",
+    "order": 1,
+    "wave": 1
+  },
+  "tags": ["void", "minimal", "meditative", "ego-dissolution", "dark", "zen", "mystical", "base-state"],
+  "telos": ["process-shadow", "facilitate-transcendence", "support-meditative-states"],
+  "essenceLabels": ["void", "meditative", "minimal", "reactive"],
+  "motion_profile": "gentle",
+  "power_rating": 1,
+  "aesthetic_coherence_score": 1.0,
+  "color_palette": {
+    "primary": "#050508",
+    "secondary": "#0a0a0f",
+    "accent": "#151520",
+    "highlight": "#2a2a3a"
+  },
+  "safety": {
+    "maxStrobeHz": 0.5,
+    "photosensitiveWarning": false,
+    "lowSensoryFriendly": true,
+    "maxBrightness": 0.3,
+    "maxSaturation": 0.4
+  },
+  "performance": {
+    "targetFPS": 60,
+    "gpuIntensity": "low",
+    "hasLOD": false,
+    "hasFallback": false
+  },
+  "metaphysicalNotes": "The void is not empty but full of unmanifest potential. This pack guides the practitioner through ego dissolution into the primordial darkness where all creation begins. The Unseen Series starts here."
+}

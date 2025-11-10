@@ -1,0 +1,41 @@
+{
+  "id": "liminal-threads",
+  "name": "Liminal Threads",
+  "version": "1.0.0",
+  "author": "Sacred Shifter Collective",
+  "description": "Invisible currents turning into filaments. Faint lines trace the pathways of unseen forces. Threadlike wisps respond to your presence, revealing the web that connects all things. The field becomes alive, subtly reactive.",
+  "esm_url": "index.js",
+  "minEngine": "1.0.0",
+  "series": {
+    "id": "the-unseen",
+    "name": "The Unseen Series",
+    "order": 3,
+    "wave": 1
+  },
+  "tags": ["threads", "filaments", "reactive", "alive", "connections", "web", "unseen"],
+  "telos": ["facilitate-transcendence", "support-meditative-states", "enhance-collective-field"],
+  "essenceLabels": ["reactive", "subtle", "structured", "meditative"],
+  "motion_profile": "structured",
+  "power_rating": 3,
+  "aesthetic_coherence_score": 1.0,
+  "color_palette": {
+    "primary": "#0a0a0f",
+    "secondary": "#1a1a2e",
+    "accent": "#3a3a5a",
+    "highlight": "#5a5a8a"
+  },
+  "safety": {
+    "maxStrobeHz": 1.0,
+    "photosensitiveWarning": false,
+    "lowSensoryFriendly": true,
+    "maxBrightness": 0.6,
+    "maxSaturation": 0.5
+  },
+  "performance": {
+    "targetFPS": 60,
+    "gpuIntensity": "medium",
+    "hasLOD": true,
+    "hasFallback": true
+  },
+  "metaphysicalNotes": "Liminal Threads reveal the connections between all things. Coherence increases thread density. Gain reveals alignment. The web of consciousness becomes visible through sustained attention."
+}

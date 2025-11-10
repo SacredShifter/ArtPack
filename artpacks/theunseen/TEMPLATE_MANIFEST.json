@@ -1,0 +1,41 @@
+{
+  "id": "pack-id-kebab-case",
+  "name": "Pack Display Name",
+  "version": "1.0.0",
+  "author": "Sacred Shifter Collective",
+  "description": "Deep description of the pack's purpose, visual style, and metaphysical intention. Should evoke the experience and guide the practitioner.",
+  "esm_url": "index.js",
+  "minEngine": "1.0.0",
+  "series": {
+    "id": "the-unseen",
+    "name": "The Unseen Series",
+    "order": 1,
+    "wave": 1
+  },
+  "tags": ["tag1", "tag2", "tag3"],
+  "telos": ["facilitate-transcendence", "support-meditative-states"],
+  "essenceLabels": ["subtle", "meditative", "reactive"],
+  "motion_profile": "gentle|flowing|structured|dynamic|intense",
+  "power_rating": 3,
+  "aesthetic_coherence_score": 1.0,
+  "color_palette": {
+    "primary": "#0a0a0f",
+    "secondary": "#1a1a2e",
+    "accent": "#4a4a6a",
+    "highlight": "#7a7a9a"
+  },
+  "safety": {
+    "maxStrobeHz": 1.5,
+    "photosensitiveWarning": false,
+    "lowSensoryFriendly": true,
+    "maxBrightness": 0.7,
+    "maxSaturation": 0.6
+  },
+  "performance": {
+    "targetFPS": 60,
+    "gpuIntensity": "low|medium|high",
+    "hasLOD": true,
+    "hasFallback": true
+  },
+  "metaphysicalNotes": "The deeper teaching or spiritual insight this pack offers. What consciousness state it facilitates. What it reveals about the unseen."
+}
