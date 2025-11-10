@@ -34,6 +34,10 @@ float hash(vec2 p) {
   return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453123);
 }
 
+float hash1D(float p) {
+  return fract(sin(p * 127.1) * 43758.5453123);
+}
+
 float sdCircle(vec2 p, vec2 center, float radius) {
   return length(p - center) - radius;
 }
@@ -90,6 +94,8 @@ export function register(engine) {
 
       vec2 nodes[24];
       float nodeActivation[24];
+      float nodeDepth[24];
+      float nodeFiring[24];
 
       for(float i = 0.0; i < NODE_COUNT; i++) {
         float seed = i * 47.3 + uSeed;
@@ -97,46 +103,75 @@ export function register(engine) {
         float angle = (i / NODE_COUNT) * 6.28318 * mix(1.0, 0.5, symmetry);
         float radius = 0.5 + hash(vec2(seed)) * 0.5;
 
-        float x = cos(angle + uTime * 0.1 * (1.0 - symmetry)) * radius;
-        float y = sin(angle + uTime * 0.1 * (1.0 - symmetry)) * radius;
+        float depthLayer = hash1D(seed + 1000.0);
+        nodeDepth[int(i)] = 0.5 + depthLayer * 0.5;
 
-        nodes[int(i)] = vec2(x, y);
+        float microJitterX = snoise(vec2(uTime * 0.3, seed)) * 0.015 * (1.0 - uStillness);
+        float microJitterY = snoise(vec2(uTime * 0.3, seed + 100.0)) * 0.015 * (1.0 - uStillness);
+
+        float x = cos(angle + uTime * 0.1 * (1.0 - symmetry)) * radius + microJitterX;
+        float y = sin(angle + uTime * 0.1 * (1.0 - symmetry)) * radius + microJitterY;
+
+        nodes[int(i)] = vec2(x, y) * nodeDepth[int(i)];
 
         float pulse = sin(uTime * pulseSpeed + seed) * 0.5 + 0.5;
         nodeActivation[int(i)] = pulse;
+
+        float activationWave = sin(uTime * 2.0 - float(i) * 0.5) * 0.5 + 0.5;
+        nodeFiring[int(i)] = pow(activationWave, 3.0);
       }
 
+      float burstPhase = sin(uTime * 0.5) * 0.5 + 0.5;
+      float synchronousBurst = pow(burstPhase, 8.0) * uCoherence;
+
       float field = 0.0;
+      float trailField = 0.0;
 
       for(int i = 0; i < int(NODE_COUNT); i++) {
         vec2 node = nodes[i];
-        float dist = length(p - node);
+        float depth = nodeDepth[i];
+        float parallaxScale = mix(0.7, 1.3, depth);
 
-        float nodeBrightness = nodeActivation[i];
-        float nodeGlow = exp(-dist * 8.0) * nodeBrightness;
-        field += nodeGlow * 0.5;
+        vec2 parallaxNode = node * parallaxScale;
+        float dist = length(p - parallaxNode);
 
-        float nodeCore = smoothstep(0.03, 0.01, dist);
-        field += nodeCore * nodeBrightness;
+        float nodeBrightness = nodeActivation[i] * (0.5 + nodeFiring[i] * 0.5 + synchronousBurst);
+
+        float nodeGlow = exp(-dist * (8.0 * depth)) * nodeBrightness;
+        field += nodeGlow * 0.5 * depth;
+
+        float nodeCore = smoothstep(0.03 * depth, 0.01 * depth, dist);
+        field += nodeCore * nodeBrightness * 1.5;
+
+        float fireTrail = exp(-dist * 4.0) * nodeFiring[i] * 0.3;
+        vec2 flowDir = normalize(node);
+        float directionalTrail = exp(-sdSegment(p, parallaxNode, parallaxNode + flowDir * 0.15 * nodeFiring[i], 0.005));
+        trailField += directionalTrail * nodeFiring[i] * 0.4;
       }
 
       for(int i = 0; i < int(NODE_COUNT); i++) {
         for(int j = i + 1; j < int(NODE_COUNT); j++) {
           vec2 a = nodes[i];
           vec2 b = nodes[j];
+          float depthA = nodeDepth[i];
+          float depthB = nodeDepth[j];
+          float avgDepth = (depthA + depthB) * 0.5;
 
           float connectionDist = length(a - b);
           if(connectionDist < 1.2) {
             float strength = 1.0 - connectionDist / 1.2;
             strength *= nodeActivation[i] * nodeActivation[j];
 
-            float lineDist = sdSegment(p, a, b, 0.002);
+            float strandPulse = sin(uPhase * 0.5) * 0.5 + 0.5;
+            float thicknessMod = 0.002 * (0.8 + strandPulse * 0.4);
+
+            float lineDist = sdSegment(p, a, b, thicknessMod);
             float connection = smoothstep(0.015, 0.0, lineDist);
 
             float travelWave = sin((uTime * pulseSpeed * 2.0) - connectionDist * 5.0) * 0.5 + 0.5;
-            connection *= strength * (0.3 + travelWave * 0.4);
+            connection *= strength * (0.3 + travelWave * 0.4 + synchronousBurst * 0.3);
 
-            field += connection * 0.3;
+            field += connection * 0.3 * avgDepth;
           }
         }
       }
@@ -152,12 +187,15 @@ export function register(engine) {
       vec3 baseColor = vec3(0.02, 0.015, 0.03);
       vec3 synapticColor = vec3(0.15, 0.12, 0.3);
       vec3 pulseColor = vec3(0.3, 0.25, 0.5);
+      vec3 fireColor = vec3(0.4, 0.3, 0.6);
 
       vec3 color = baseColor;
       color = mix(color, synapticColor, field * 0.7);
       color = mix(color, pulseColor, field * ambientActivity * 0.4);
+      color = mix(color, fireColor, trailField);
 
       color *= 0.85 + breath * 0.08;
+      color += vec3(synchronousBurst * 0.15);
 
       gl_FragColor = vec4(color, 1.0);
     }
