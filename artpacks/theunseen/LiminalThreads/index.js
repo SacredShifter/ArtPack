@@ -30,6 +30,10 @@ float snoise(vec2 v) {
   return 130.0 * dot(m, g);
 }
 
+float hash(float p) {
+  return fract(sin(p * 127.1) * 43758.5453123);
+}
+
 vec2 curl(vec2 p, float time) {
   float eps = 0.01;
   float n1 = snoise(p + vec2(eps, 0.0) + time * 0.1);
@@ -93,44 +97,75 @@ export function register(engine) {
       float threadDensity = coherenceToDensity(uCoherence);
       float alignment = gainToAlignment(uGain);
 
-      vec2 flowField = curl(p * 2.0, uTime * 0.3);
+      float microJitterX = snoise(vec2(uTime * 0.15, 1.0)) * 0.012 * (1.0 - uStillness);
+      float microJitterY = snoise(vec2(uTime * 0.15, 2.0)) * 0.012 * (1.0 - uStillness);
+      vec2 jitteredP = p + vec2(microJitterX, microJitterY);
+
+      vec2 flowField = curl(jitteredP * 2.0, uTime * 0.3);
 
       float threads = 0.0;
+      float glowField = 0.0;
+
+      float synchronousBurst = pow(sin(uTime * 0.45) * 0.5 + 0.5, 8.0) * uCoherence;
 
       for(float i = 0.0; i < 15.0; i++) {
         if(i >= threadDensity) break;
 
         float offset = i * 47.3 + uSeed;
+
+        float threadDepth = 0.5 + hash(offset) * 0.5;
+        float parallaxScale = mix(0.85, 1.15, threadDepth);
+
         vec2 seed = vec2(
           snoise(vec2(offset * 0.1, uTime * 0.02 + offset)),
           snoise(vec2(offset * 0.1 + 100.0, uTime * 0.02 + offset))
         );
 
-        vec2 start = seed * 1.5;
+        vec2 start = seed * 1.5 * parallaxScale;
         vec2 flowStart = curl(start, uTime * 0.2);
         vec2 end = start + flowStart * (0.5 + alignment * 0.5);
 
-        float lineDist = sdLine(p, start, end, 0.002);
+        float activationWave = sin(uTime * 1.8 - i * 0.4) * 0.5 + 0.5;
+        activationWave = pow(activationWave, 4.0);
+
+        float thicknessPulse = sin(uPhase * 0.5 + i * 0.15) * 0.5 + 0.5;
+        float lineThickness = 0.002 * (0.8 + thicknessPulse * 0.4) * threadDepth;
+
+        float lineDist = sdLine(jitteredP, start, end, lineThickness);
         float thread = smoothstep(0.01, 0.0, lineDist);
 
         float pulse = sin(uPhase + i * 0.2) * 0.5 + 0.5;
-        thread *= 0.3 + pulse * 0.2;
+        thread *= (0.3 + pulse * 0.2) * (0.7 + activationWave * 0.3 + synchronousBurst);
 
-        threads += thread;
+        threads += thread * threadDepth;
+
+        vec2 threadCenter = (start + end) * 0.5;
+        float threadGlow = exp(-length(jitteredP - threadCenter) * 3.0) * activationWave * 0.25 * threadDepth;
+        glowField += threadGlow;
+
+        vec2 threadDir = normalize(end - start);
+        float trailDist = sdLine(jitteredP, start, start + threadDir * 0.08 * activationWave, 0.003);
+        float trail = exp(-trailDist * 50.0) * activationWave * 0.2;
+        glowField += trail;
       }
 
       threads *= visibility;
+      glowField *= visibility;
 
       float dist = length(p);
       float vignette = smoothstep(1.3, 0.5, dist);
       threads *= vignette;
+      glowField *= vignette;
 
       vec3 baseColor = vec3(0.02, 0.015, 0.025);
       vec3 threadColor = vec3(0.15, 0.1, 0.2);
+      vec3 glowColor = vec3(0.25, 0.18, 0.35);
 
       vec3 color = mix(baseColor, threadColor, threads * 0.6);
+      color = mix(color, glowColor, glowField);
 
       color *= 0.85 + sin(uPhase) * 0.05;
+      color += vec3(synchronousBurst * 0.15);
 
       gl_FragColor = vec4(color, 1.0);
     }

@@ -33,6 +33,10 @@ float snoise(vec2 v) {
 #define PI 3.14159265359
 #define TAU 6.28318530718
 
+float hash(float p) {
+  return fract(sin(p * 127.1) * 43758.5453123);
+}
+
 float circularWave(vec2 p, vec2 center, float time, float frequency) {
   float dist = length(p - center);
   return sin(dist * frequency - time);
@@ -83,33 +87,54 @@ export function register(engine) {
       float breathAmp = breathToAmplitude(uPhase, 0.3);
       float baseAmplitude = 0.5 + breathAmp;
 
+      float microJitterX = snoise(vec2(uTime * 0.25, 1.0)) * 0.01 * (1.0 - uStillness);
+      float microJitterY = snoise(vec2(uTime * 0.25, 2.0)) * 0.01 * (1.0 - uStillness);
+      vec2 jitteredP = p + vec2(microJitterX, microJitterY);
+
       float freq1 = 4.0 + stability * 2.0;
       float freq2 = 5.0 + stability * 1.5;
       float freq3 = 3.5 + stability * 2.5;
 
-      vec2 center1 = vec2(-0.4, 0.3);
-      vec2 center2 = vec2(0.5, -0.2);
-      vec2 center3 = vec2(0.0, 0.5);
+      float waveDepth1 = 0.5 + hash(1.0) * 0.5;
+      float waveDepth2 = 0.5 + hash(2.0) * 0.5;
+      float waveDepth3 = 0.5 + hash(3.0) * 0.5;
 
-      float wave1 = circularWave(p, center1, uTime * 1.2, freq1);
-      float wave2 = circularWave(p, center2, uTime * 1.5, freq2);
-      float wave3 = circularWave(p, center3, uTime * 0.9, freq3);
+      vec2 center1 = vec2(-0.4, 0.3) * waveDepth1;
+      vec2 center2 = vec2(0.5, -0.2) * waveDepth2;
+      vec2 center3 = vec2(0.0, 0.5) * waveDepth3;
+
+      float activationWave1 = sin(uTime * 1.2) * 0.5 + 0.5;
+      activationWave1 = pow(activationWave1, 3.0);
+      float activationWave2 = sin(uTime * 1.5 + PI * 0.66) * 0.5 + 0.5;
+      activationWave2 = pow(activationWave2, 3.0);
+      float activationWave3 = sin(uTime * 0.9 + PI * 1.33) * 0.5 + 0.5;
+      activationWave3 = pow(activationWave3, 3.0);
+
+      float wave1 = circularWave(jitteredP, center1, uTime * 1.2, freq1) * (0.6 + activationWave1 * 0.4);
+      float wave2 = circularWave(jitteredP, center2, uTime * 1.5, freq2) * (0.6 + activationWave2 * 0.4);
+      float wave3 = circularWave(jitteredP, center3, uTime * 0.9, freq3) * (0.6 + activationWave3 * 0.4);
+
+      float glowField = 0.0;
+      glowField += exp(-length(jitteredP - center1) * 2.0) * activationWave1 * 0.3 * waveDepth1;
+      glowField += exp(-length(jitteredP - center2) * 2.0) * activationWave2 * 0.3 * waveDepth2;
+      glowField += exp(-length(jitteredP - center3) * 2.0) * activationWave3 * 0.3 * waveDepth3;
 
       vec2 dir1 = normalize(vec2(1.0, 0.5));
       vec2 dir2 = normalize(vec2(-0.7, 1.0));
-      float planeWave1 = planeWave(p, dir1, uTime * 2.0, 3.0);
-      float planeWave2 = planeWave(p, dir2, uTime * 1.7, 3.5);
+      float planeWave1 = planeWave(jitteredP, dir1, uTime * 2.0, 3.0);
+      float planeWave2 = planeWave(jitteredP, dir2, uTime * 1.7, 3.5);
 
       float interference = (wave1 + wave2 + wave3) / 3.0;
       interference += (planeWave1 + planeWave2) * 0.3;
 
-      interference *= baseAmplitude;
+      float amplitudePulse = sin(uPhase * 0.5) * 0.5 + 0.5;
+      interference *= baseAmplitude * (0.8 + amplitudePulse * 0.4);
 
-      float standingWave = sin(length(p) * 8.0 * stability) *
-                           cos(atan(p.y, p.x) * 4.0 + uTime * 0.5);
+      float standingWave = sin(length(jitteredP) * 8.0 * stability) *
+                           cos(atan(jitteredP.y, jitteredP.x) * 4.0 + uTime * 0.5);
       interference += standingWave * stability * 0.4;
 
-      float modulation = snoise(p * 2.0 + uTime * 0.3) * 0.5 + 0.5;
+      float modulation = snoise(jitteredP * 2.0 + uTime * 0.3) * 0.5 + 0.5;
       interference *= 0.7 + modulation * 0.3;
 
       interference = (interference + 1.0) * 0.5;
@@ -119,21 +144,27 @@ export function register(engine) {
 
       float field = mix(interference, resonanceBands, stability * 0.6);
 
+      float synchronousBurst = pow(sin(uTime * 0.35) * 0.5 + 0.5, 12.0) * uCoherence;
+
       float dist = length(p);
       float vignette = smoothstep(1.5, 0.4, dist);
       field *= vignette;
+      glowField *= vignette;
 
       vec3 baseColor = vec3(0.02, 0.015, 0.03);
       vec3 waveColor1 = vec3(0.1, 0.15, 0.3);
       vec3 waveColor2 = vec3(0.2, 0.15, 0.35);
       vec3 resonanceColor = vec3(0.25, 0.2, 0.4);
+      vec3 activationColor = vec3(0.35, 0.25, 0.5);
 
       vec3 color = baseColor;
       color = mix(color, waveColor1, field * 0.5);
       color = mix(color, waveColor2, field * interference * 0.3);
       color = mix(color, resonanceColor, resonanceBands * stability * 0.4);
+      color = mix(color, activationColor, glowField);
 
       color *= 0.88 + sin(uPhase) * 0.06;
+      color += vec3(synchronousBurst * 0.18);
 
       gl_FragColor = vec4(color, 1.0);
     }

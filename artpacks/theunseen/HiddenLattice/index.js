@@ -94,6 +94,10 @@ float snoise(vec2 v) {
   g.yz = a0.yz * x12.xz + h.yz * x12.yw;
   return 130.0 * dot(m, g);
 }
+
+float hash(float p) {
+  return fract(sin(p * 127.1) * 43758.5453123);
+}
 `;
 
 export function register(engine) {
@@ -138,35 +142,61 @@ export function register(engine) {
 
       float scale = 0.4 + breath * 0.05;
 
+      float geometryActivation = sin(uTime * 1.5) * 0.5 + 0.5;
+      float activationWave = pow(geometryActivation, 6.0);
+
+      float synchronousBurst = pow(sin(uTime * 0.4) * 0.5 + 0.5, 10.0) * uCoherence;
+
       float rotation = uTime * 0.05 * (1.0 - stability);
       float c = cos(rotation);
       float s = sin(rotation);
       mat2 rot = mat2(c, -s, s, c);
       vec2 rotP = rot * p;
 
-      float lattice = 0.0;
+      float microJitterX = snoise(vec2(uTime * 0.2, 1.0)) * 0.008 * (1.0 - stability);
+      float microJitterY = snoise(vec2(uTime * 0.2, 2.0)) * 0.008 * (1.0 - stability);
+      vec2 jitteredP = rotP + vec2(microJitterX, microJitterY);
 
-      float hex = hexLattice(rotP * 3.0, 1.0);
+      float lattice = 0.0;
+      float glowField = 0.0;
+
+      float hex = hexLattice(jitteredP * 3.0, 1.0);
       lattice += smoothstep(0.95, 0.98, hex) * 0.3;
 
       float flowerRadius = scale * 0.6;
       float flowerThickness = 0.005 + clarity * 0.003;
-      float flower = flowerOfLife(rotP, vec2(0.0), flowerRadius, flowerThickness);
-      lattice += flower * 0.5;
+      float thicknessPulse = sin(uPhase * 0.5) * 0.5 + 0.5;
+      flowerThickness *= (0.8 + thicknessPulse * 0.4);
+
+      float flower = flowerOfLife(jitteredP, vec2(0.0), flowerRadius, flowerThickness);
+      lattice += flower * (0.5 + activationWave * 0.3);
+
+      float centerDist = length(jitteredP);
+      glowField += exp(-centerDist * 3.0) * activationWave * 0.4;
 
       for(float i = 0.0; i < 3.0; i++) {
+        float layerDepth = 0.5 + hash(i + 100.0) * 0.5;
+        float parallaxScale = mix(0.8, 1.2, layerDepth);
+
         float layerScale = 0.3 + i * 0.25;
-        float layerRotation = rotation + i * PI / 3.0;
+        float layerRotation = rotation + i * PI / 3.0 + uTime * 0.1 * (1.0 - stability);
         float lc = cos(layerRotation);
         float ls = sin(layerRotation);
         mat2 layerRot = mat2(lc, -ls, ls, lc);
-        vec2 layerP = layerRot * p;
+        vec2 layerP = layerRot * p * parallaxScale;
 
         float tri = triangleGrid(layerP, layerScale, 0.005);
-        lattice += tri * (0.15 + clarity * 0.1) * (1.0 - i * 0.2);
+        float layerActivation = sin(uTime * 1.5 - i * 1.0) * 0.5 + 0.5;
+        layerActivation = pow(layerActivation, 4.0);
+
+        lattice += tri * (0.15 + clarity * 0.1) * (1.0 - i * 0.2) * (0.7 + layerActivation * 0.3);
+
+        vec2 triCenter = layerP;
+        float triDist = length(triCenter);
+        glowField += exp(-triDist * 2.0) * layerActivation * 0.2 * layerDepth;
       }
 
-      float crystallineNoise = snoise(rotP * 8.0 + uTime * 0.1) * 0.5 + 0.5;
+      float crystallineNoise = snoise(jitteredP * 8.0 + uTime * 0.1) * 0.5 + 0.5;
       crystallineNoise = pow(crystallineNoise, 3.0);
       lattice += crystallineNoise * clarity * 0.15;
 
@@ -175,17 +205,21 @@ export function register(engine) {
       float dist = length(p);
       float vignette = smoothstep(1.4, 0.4, dist);
       lattice *= vignette;
+      glowField *= vignette;
 
       vec3 baseColor = vec3(0.02, 0.015, 0.03);
       vec3 latticeColor = vec3(0.15, 0.12, 0.25);
       vec3 highlightColor = vec3(0.25, 0.20, 0.35);
+      vec3 activationColor = vec3(0.35, 0.28, 0.45);
 
       vec3 color = baseColor;
       color = mix(color, latticeColor, lattice * 0.6);
       color = mix(color, highlightColor, lattice * crystallineNoise * 0.3);
+      color = mix(color, activationColor, glowField);
 
       color *= 0.90 + breath * 0.05;
       color *= mix(1.0, 0.7, 1.0 - stability);
+      color += vec3(synchronousBurst * 0.2);
 
       gl_FragColor = vec4(color, 1.0);
     }
