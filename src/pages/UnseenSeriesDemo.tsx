@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { Play, Pause, SkipForward, Sliders } from 'lucide-react';
+import { Play, Pause, SkipForward, Sliders, ChevronDown, ChevronUp } from 'lucide-react';
 import * as THREE from 'three';
 
 interface Pack {
@@ -81,6 +81,7 @@ export default function UnseenSeriesDemo() {
   const [isPlaying, setIsPlaying] = useState(false);
   const [autoCycle, setAutoCycle] = useState(false);
   const [showControls, setShowControls] = useState(true);
+  const [minimized, setMinimized] = useState(false);
 
   const [coherence, setCoherence] = useState(0.5);
   const [stillness, setStillness] = useState(0.5);
@@ -276,86 +277,98 @@ export default function UnseenSeriesDemo() {
       <canvas ref={canvasRef} className="absolute inset-0" />
 
       <div className="absolute top-6 left-6 z-10 max-w-md">
-        <div className="bg-slate-900/80 backdrop-blur-md border border-purple-500/30 rounded-xl p-6 shadow-2xl">
-          <div className="flex items-center justify-between mb-2">
-            <h1 className="text-2xl font-bold text-white">
-              The Unseen Series
-            </h1>
-            <span className="px-3 py-1 bg-purple-500/20 text-purple-300 rounded-full text-sm">
-              Wave {currentPack.wave}
-            </span>
-          </div>
-
-          <div className="mb-4">
-            <h2 className="text-xl font-semibold text-purple-200 mb-1">
-              {currentPack.name}
-            </h2>
-            <p className="text-sm text-purple-300/70 mb-2">
-              {currentPack.description}
-            </p>
-            <div className="flex items-center gap-3 text-xs">
-              <span className="px-2 py-1 bg-purple-500/20 text-purple-300 rounded">
-                {currentPack.motionProfile}
-              </span>
-              <span className="text-purple-400">
-                {'⚡'.repeat(currentPack.powerRating)}
+        <div className="bg-slate-900/80 backdrop-blur-md border border-purple-500/30 rounded-xl shadow-2xl overflow-hidden transition-all">
+          <div
+            className="flex items-center justify-between p-4 cursor-pointer hover:bg-slate-800/40 transition-colors"
+            onClick={() => setMinimized(!minimized)}
+          >
+            <div className="flex items-center gap-3">
+              <h1 className="text-lg font-bold text-white">
+                The Unseen Series
+              </h1>
+              <span className="px-2 py-1 bg-purple-500/20 text-purple-300 rounded-full text-xs">
+                {currentPack.order}/6
               </span>
             </div>
-          </div>
-
-          <div className="grid grid-cols-3 gap-2 mb-4">
-            {UNSEEN_PACKS.map((pack, index) => (
-              <button
-                key={pack.id}
-                onClick={() => selectPack(index)}
-                className={`p-2 rounded-lg text-xs font-medium transition-all ${
-                  index === currentPackIndex
-                    ? 'bg-purple-500 text-white shadow-lg shadow-purple-500/50'
-                    : 'bg-slate-800/60 text-purple-300 hover:bg-slate-700/80'
-                }`}
-              >
-                {pack.order}. {pack.name.split(' ')[0]}
-              </button>
-            ))}
-          </div>
-
-          <div className="flex gap-2">
-            <button
-              onClick={() => setIsPlaying(!isPlaying)}
-              className="flex-1 flex items-center justify-center gap-2 px-4 py-2 bg-purple-500 hover:bg-purple-600 text-white rounded-lg transition-colors"
-            >
-              {isPlaying ? <Pause className="w-4 h-4" /> : <Play className="w-4 h-4" />}
-              {isPlaying ? 'Pause' : 'Play'}
-            </button>
-            <button
-              onClick={nextPack}
-              className="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-purple-300 rounded-lg transition-colors"
-              title="Next Pack"
-            >
-              <SkipForward className="w-4 h-4" />
-            </button>
-            <button
-              onClick={() => setShowControls(!showControls)}
-              className={`px-4 py-2 rounded-lg transition-colors ${
-                showControls
-                  ? 'bg-purple-500/20 text-purple-300'
-                  : 'bg-slate-800 text-purple-400'
-              }`}
-              title="Toggle Controls"
-            >
-              <Sliders className="w-4 h-4" />
+            <button className="text-purple-300 hover:text-purple-200 transition-colors">
+              {minimized ? <ChevronDown className="w-5 h-5" /> : <ChevronUp className="w-5 h-5" />}
             </button>
           </div>
 
-          <label className="flex items-center gap-2 mt-3 text-sm text-purple-300 cursor-pointer">
-            <input
-              type="checkbox"
-              checked={autoCycle}
-              onChange={(e) => setAutoCycle(e.target.checked)}
-              className="w-4 h-4 accent-purple-500"
-            />
-            Auto-cycle packs (15s)
-          </label>
+          {!minimized && (
+            <div className="p-6 pt-2">
+              <div className="mb-4">
+                <h2 className="text-xl font-semibold text-purple-200 mb-1">
+                  {currentPack.name}
+                </h2>
+                <p className="text-sm text-purple-300/70 mb-2">
+                  {currentPack.description}
+                </p>
+                <div className="flex items-center gap-3 text-xs">
+                  <span className="px-2 py-1 bg-purple-500/20 text-purple-300 rounded">
+                    {currentPack.motionProfile}
+                  </span>
+                  <span className="text-purple-400">
+                    {'⚡'.repeat(currentPack.powerRating)}
+                  </span>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-3 gap-2 mb-4">
+                {UNSEEN_PACKS.map((pack, index) => (
+                  <button
+                    key={pack.id}
+                    onClick={() => selectPack(index)}
+                    className={`p-2 rounded-lg text-xs font-medium transition-all ${
+                      index === currentPackIndex
+                        ? 'bg-purple-500 text-white shadow-lg shadow-purple-500/50'
+                        : 'bg-slate-800/60 text-purple-300 hover:bg-slate-700/80'
+                    }`}
+                  >
+                    {pack.order}. {pack.name.split(' ')[0]}
+                  </button>
+                ))}
+              </div>
+
+              <div className="flex gap-2">
+                <button
+                  onClick={() => setIsPlaying(!isPlaying)}
+                  className="flex-1 flex items-center justify-center gap-2 px-4 py-2 bg-purple-500 hover:bg-purple-600 text-white rounded-lg transition-colors"
+                >
+                  {isPlaying ? <Pause className="w-4 h-4" /> : <Play className="w-4 h-4" />}
+                  {isPlaying ? 'Pause' : 'Play'}
+                </button>
+                <button
+                  onClick={nextPack}
+                  className="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-purple-300 rounded-lg transition-colors"
+                  title="Next Pack"
+                >
+                  <SkipForward className="w-4 h-4" />
+                </button>
+                <button
+                  onClick={() => setShowControls(!showControls)}
+                  className={`px-4 py-2 rounded-lg transition-colors ${
+                    showControls
+                      ? 'bg-purple-500/20 text-purple-300'
+                      : 'bg-slate-800 text-purple-400'
+                  }`}
+                  title="Toggle Controls"
+                >
+                  <Sliders className="w-4 h-4" />
+                </button>
+              </div>
+
+              <label className="flex items-center gap-2 mt-3 text-sm text-purple-300 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={autoCycle}
+                  onChange={(e) => setAutoCycle(e.target.checked)}
+                  className="w-4 h-4 accent-purple-500"
+                />
+                Auto-cycle packs (15s)
+              </label>
+            </div>
+          )}
         </div>
       </div>
 
