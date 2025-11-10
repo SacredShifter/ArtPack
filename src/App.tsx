@@ -7,12 +7,14 @@ import { EventsHub } from './pages/EventsHub';
 import { GuidedSessionPlayer } from './pages/GuidedSessionPlayer';
 import { SessionsHub } from './pages/SessionsHub';
 import { DocsHub } from './pages/DocsHub';
+import UnseenSeriesDemo from './pages/UnseenSeriesDemo';
 
 function App() {
   return (
     <BrowserRouter>
       <Routes>
-        <Route path="/" element={<SessionsHub />} />
+        <Route path="/" element={<UnseenSeriesDemo />} />
+        <Route path="/unseen" element={<UnseenSeriesDemo />} />
         <Route path="/sessions" element={<SessionsHub />} />
         <Route path="/sessions/:sessionId" element={<GuidedSessionPlayer />} />
         <Route path="/events" element={<EventsHub />} />
