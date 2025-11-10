@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { Play, Pause, SkipForward, Sliders, ChevronDown, ChevronUp } from 'lucide-react';
+import { Play, Pause, SkipForward, Sliders, ChevronDown, ChevronUp, Camera } from 'lucide-react';
 import * as THREE from 'three';
 
 interface Pack {
@@ -87,6 +87,7 @@ export default function UnseenSeriesDemo() {
   const [stillness, setStillness] = useState(0.5);
   const [gain, setGain] = useState(0.5);
   const [phase, setPhase] = useState(0);
+  const [capturing, setCapturing] = useState(false);
 
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const sceneRef = useRef<THREE.Scene | null>(null);
@@ -158,12 +159,18 @@ export default function UnseenSeriesDemo() {
   useEffect(() => {
     let phaseInterval: NodeJS.Timeout;
     if (isPlaying) {
+      startAnimation();
       phaseInterval = setInterval(() => {
         setPhase((prev) => (prev + 0.05) % (Math.PI * 2));
       }, 50);
+    } else {
+      if (animationFrameRef.current) {
+        cancelAnimationFrame(animationFrameRef.current);
+        animationFrameRef.current = null;
+      }
     }
     return () => clearInterval(phaseInterval);
-  }, [isPlaying]);
+  }, [isPlaying, coherence, stillness, gain, phase]);
 
   const loadCurrentPack = async () => {
     if (!sceneRef.current || !rendererRef.current) return;
@@ -272,6 +279,33 @@ export default function UnseenSeriesDemo() {
     setCurrentPackIndex(index);
   };
 
+  const captureSnapshot = async () => {
+    if (!canvasRef.current) return;
+
+    setCapturing(true);
+
+    try {
+      const canvas = canvasRef.current;
+      const blob = await new Promise<Blob>((resolve) => {
+        canvas.toBlob((blob) => resolve(blob!), 'image/png');
+      });
+
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `unseen-${currentPack.id}-${Date.now()}.png`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+
+      setTimeout(() => setCapturing(false), 1000);
+    } catch (error) {
+      console.error('Capture failed:', error);
+      setCapturing(false);
+    }
+  };
+
   return (
     <div className="relative w-full h-screen bg-black overflow-hidden">
       <canvas ref={canvasRef} className="absolute inset-0" />
@@ -330,7 +364,7 @@ export default function UnseenSeriesDemo() {
                 ))}
               </div>
 
-              <div className="flex gap-2">
+              <div className="flex gap-2 mb-3">
                 <button
                   onClick={() => setIsPlaying(!isPlaying)}
                   className="flex-1 flex items-center justify-center gap-2 px-4 py-2 bg-purple-500 hover:bg-purple-600 text-white rounded-lg transition-colors"
@@ -357,6 +391,15 @@ export default function UnseenSeriesDemo() {
                   <Sliders className="w-4 h-4" />
                 </button>
               </div>
+
+              <button
+                onClick={captureSnapshot}
+                disabled={capturing}
+                className="w-full flex items-center justify-center gap-2 px-4 py-2 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 disabled:from-slate-700 disabled:to-slate-700 text-white rounded-lg transition-all shadow-lg"
+              >
+                <Camera className="w-4 h-4" />
+                {capturing ? 'Capturing...' : 'Capture Snapshot'}
+              </button>
 
               <label className="flex items-center gap-2 mt-3 text-sm text-purple-300 cursor-pointer">
                 <input
