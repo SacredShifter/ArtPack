@@ -158,8 +158,8 @@ export function register(engine) {
     vec3 renderUnseenLayer(vec2 uv, float time, float seed) {
       vec2 p = (uv - 0.5) * 4.0;
 
-      // Soft atmospheric base
-      vec3 atmosphere = vec3(0.02, 0.025, 0.035);
+      // Soft atmospheric base - brightened for visibility
+      vec3 atmosphere = vec3(0.08, 0.10, 0.14);
 
       // Whisper field currents
       vec2 flowPos = p * 2.0;
@@ -200,11 +200,11 @@ export function register(engine) {
         depth += pow(max(0.0, layer), 2.0) * (0.1 / (fi + 1.0));
       }
 
-      // Compose unseen
+      // Compose unseen - enhanced visibility
       vec3 unseen = atmosphere;
-      unseen += vec3(0.03, 0.04, 0.06) * threads;
-      unseen += vec3(0.08, 0.1, 0.15) * particles;
-      unseen += vec3(0.02, 0.025, 0.04) * depth;
+      unseen += vec3(0.08, 0.10, 0.14) * threads;
+      unseen += vec3(0.15, 0.18, 0.25) * particles;
+      unseen += vec3(0.06, 0.08, 0.12) * depth;
 
       return unseen;
     }
@@ -216,8 +216,8 @@ export function register(engine) {
     vec3 renderSeenLayer(vec2 uv, float time, float seed, float gain) {
       vec2 p = (uv - 0.5) * 4.0;
 
-      // Base luminosity
-      vec3 luminosity = vec3(0.1, 0.12, 0.15);
+      // Base luminosity - increased for visibility
+      vec3 luminosity = vec3(0.18, 0.20, 0.24);
 
       // Sacred geometry - Flower of Life
       vec2 flowerCenter = vec2(0.0);
