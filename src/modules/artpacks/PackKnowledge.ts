@@ -124,6 +124,25 @@ export const PACK_KNOWLEDGE: Record<string, PackKnowledgeTemplate> = {
       }
       return "Everything vibrates. Form is frozen music. Where patterns meet, reality appears.";
     }
+  },
+
+  'duality-threshold': {
+    title: 'DUALITY — THE UNSEEN & THE SEEN',
+    essence: 'Where shadow meets form. Where the unexpressed becomes shape. The field oscillates between what remains hidden and what steps into visibility — revealing the threshold where consciousness recognizes itself without losing depth.',
+    visualNote: 'Soft currents layered beneath crystalline geometry. Interference patterns giving way to structure. Light finding edges. Darkness retaining memory. The threshold made visible.',
+    foundation: 'Wave-particle duality as consciousness principle. Observer effect made visible. Form and formlessness operating simultaneously. The axis where potential meets manifestation.',
+    getInterpretation: (coherence, stillness) => {
+      if (coherence < 35) {
+        return "The unseen holds dominion. Potential vast, form distant. Rest in the dark that knows itself.";
+      }
+      if (coherence >= 35 && coherence < 65) {
+        return "The threshold oscillates. You witness the crossing itself — neither fully hidden nor fully revealed. This is the axis where all states converge.";
+      }
+      if (coherence >= 65) {
+        return "Emergence stabilizing. Form crystallizing from shadow. Consciousness watches itself step into visibility while retaining mystery.";
+      }
+      return "The threshold awaits. Between darkness and light, recognition occurs.";
+    }
   }
 };
 

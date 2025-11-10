@@ -8,6 +8,7 @@ export interface CompositorOptions {
   padding?: number;
   fontSize?: number;
   lineHeight?: number;
+  packId?: string;
 }
 
 export class KnowledgeCardCompositor {
@@ -26,8 +27,12 @@ export class KnowledgeCardCompositor {
       overlayOpacity = 0.92,
       padding = 40,
       fontSize = 14,
-      lineHeight = 1.6
+      lineHeight = 1.6,
+      packId
     } = options;
+
+    // Check if this is the finale pack for special treatment
+    const isFinale = packId === 'duality-threshold';
 
     // Create temporary canvas for compositing
     const canvas = document.createElement('canvas');
@@ -39,8 +44,9 @@ export class KnowledgeCardCompositor {
     // Draw original content
     ctx.drawImage(sourceCanvas, 0, 0);
 
-    // Calculate overlay dimensions (bottom 35% of canvas)
-    const overlayHeight = canvas.height * 0.35;
+    // Calculate overlay dimensions (40% for finale, 35% for others)
+    const overlayHeightPercent = isFinale ? 0.40 : 0.35;
+    const overlayHeight = canvas.height * overlayHeightPercent;
     const overlayY = canvas.height - overlayHeight;
 
     // Draw refined overlay with gradient wash
@@ -73,7 +79,7 @@ export class KnowledgeCardCompositor {
       height: overlayHeight - (padding * 2),
       fontSize,
       lineHeight
-    });
+    }, isFinale);
 
     // Convert to blob
     return new Promise((resolve) => {
@@ -91,7 +97,8 @@ export class KnowledgeCardCompositor {
       height: number;
       fontSize: number;
       lineHeight: number;
-    }
+    },
+    isFinale: boolean = false
   ) {
     const lines = text.split('\n');
     let currentY = layout.y;
@@ -105,13 +112,27 @@ export class KnowledgeCardCompositor {
       // Style based on line content with refined hierarchy
       if (line.match(/^[A-Z\s]{10,}$/)) {
         // ALL CAPS HEADERS - Maximum prestige
-        ctx.font = `700 ${layout.fontSize * 1.25}px "Inter", -apple-system, system-ui, sans-serif`;
-        ctx.fillStyle = 'rgba(255, 255, 255, 0.97)';
-        ctx.letterSpacing = '0.15em';
-        // Add subtle text shadow for depth
-        ctx.shadowColor = 'rgba(0, 0, 0, 0.5)';
-        ctx.shadowBlur = 2;
-        ctx.shadowOffsetY = 1;
+        // Finale gets serif font and dual-tone gradient
+        if (isFinale && line.includes('DUALITY')) {
+          ctx.font = `700 ${layout.fontSize * 1.4}px Georgia, "Times New Roman", serif`;
+          ctx.letterSpacing = '0.18em';
+          // Dual-tone gradient: gold to white
+          const titleGradient = ctx.createLinearGradient(layout.x, 0, layout.x + layout.width, 0);
+          titleGradient.addColorStop(0, 'rgba(200, 160, 100, 1)');
+          titleGradient.addColorStop(0.5, 'rgba(255, 245, 220, 1)');
+          titleGradient.addColorStop(1, 'rgba(255, 255, 255, 1)');
+          ctx.fillStyle = titleGradient;
+          ctx.shadowColor = 'rgba(200, 160, 100, 0.6)';
+          ctx.shadowBlur = 4;
+          ctx.shadowOffsetY = 2;
+        } else {
+          ctx.font = `700 ${layout.fontSize * 1.25}px "Inter", -apple-system, system-ui, sans-serif`;
+          ctx.fillStyle = 'rgba(255, 255, 255, 0.97)';
+          ctx.letterSpacing = '0.15em';
+          ctx.shadowColor = 'rgba(0, 0, 0, 0.5)';
+          ctx.shadowBlur = 2;
+          ctx.shadowOffsetY = 1;
+        }
       } else if (line.includes('━━━')) {
         // Separator line with refined styling
         const separatorY = currentY + (layout.fontSize * layout.lineHeight / 2);

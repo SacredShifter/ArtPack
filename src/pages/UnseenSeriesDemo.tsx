@@ -76,6 +76,16 @@ const UNSEEN_PACKS: Pack[] = [
     motionProfile: 'flowing',
     loadModule: () => import('../../artpacks/theunseen/InterferenceRealm/index.js'),
   },
+  {
+    id: 'duality-threshold',
+    name: 'Duality — The Unseen & The Seen',
+    description: 'Where shadow meets form. The threshold revealed.',
+    wave: 3,
+    order: 7,
+    powerRating: 7,
+    motionProfile: 'transcendent',
+    loadModule: () => import('../../artpacks/theunseen/DualityThreshold/index.js'),
+  },
 ];
 
 export default function UnseenSeriesDemo() {
@@ -313,7 +323,8 @@ export default function UnseenSeriesDemo() {
           overlayOpacity: 0.92,
           padding: 40,
           fontSize: 14,
-          lineHeight: 1.6
+          lineHeight: 1.6,
+          packId: currentPack.id
         });
       } else {
         // Capture clean image without knowledge card
@@ -365,36 +376,70 @@ export default function UnseenSeriesDemo() {
           {!minimized && (
             <div className="p-6 pt-2">
               <div className="mb-4">
-                <h2 className="text-xl font-semibold text-purple-200 mb-1">
-                  {currentPack.name}
-                </h2>
-                <p className="text-sm text-purple-300/70 mb-2">
+                <div className="flex items-start justify-between mb-1">
+                  <h2 className={`text-xl font-semibold mb-1 ${
+                    currentPack.wave === 3 ? 'text-amber-200' : 'text-purple-200'
+                  }`}>
+                    {currentPack.name}
+                  </h2>
+                  {currentPack.wave === 3 && (
+                    <span className="px-2 py-1 bg-gradient-to-r from-amber-500/20 to-yellow-500/20 text-amber-300 text-xs font-bold tracking-wider rounded border border-amber-500/30 flex items-center gap-1">
+                      ✦ WAVE 3 • FINALE
+                    </span>
+                  )}
+                </div>
+                <p className={`text-sm mb-2 ${
+                  currentPack.wave === 3 ? 'text-amber-300/70' : 'text-purple-300/70'
+                }`}>
                   {currentPack.description}
                 </p>
                 <div className="flex items-center gap-3 text-xs">
-                  <span className="px-2 py-1 bg-purple-500/20 text-purple-300 rounded">
+                  <span className={`px-2 py-1 rounded ${
+                    currentPack.wave === 3
+                      ? 'bg-amber-500/20 text-amber-300'
+                      : 'bg-purple-500/20 text-purple-300'
+                  }`}>
                     {currentPack.motionProfile}
                   </span>
-                  <span className="text-purple-400">
+                  <span className={currentPack.wave === 3 ? 'text-amber-400' : 'text-purple-400'}>
                     {'⚡'.repeat(currentPack.powerRating)}
                   </span>
                 </div>
               </div>
 
               <div className="grid grid-cols-3 gap-2 mb-4">
-                {UNSEEN_PACKS.map((pack, index) => (
-                  <button
-                    key={pack.id}
-                    onClick={() => selectPack(index)}
-                    className={`p-2 rounded-lg text-xs font-medium transition-all ${
-                      index === currentPackIndex
-                        ? 'bg-purple-500 text-white shadow-lg shadow-purple-500/50'
-                        : 'bg-slate-800/60 text-purple-300 hover:bg-slate-700/80'
-                    }`}
-                  >
-                    {pack.order}. {pack.name.split(' ')[0]}
-                  </button>
-                ))}
+                {UNSEEN_PACKS.map((pack, index) => {
+                  const isFinale = pack.wave === 3;
+                  const isActive = index === currentPackIndex;
+
+                  return (
+                    <button
+                      key={pack.id}
+                      onClick={() => selectPack(index)}
+                      className={`p-2 rounded-lg text-xs font-medium transition-all relative ${
+                        isActive
+                          ? isFinale
+                            ? 'bg-gradient-to-br from-amber-500 to-yellow-600 text-white shadow-lg shadow-amber-500/50'
+                            : 'bg-purple-500 text-white shadow-lg shadow-purple-500/50'
+                          : isFinale
+                            ? 'bg-slate-800/60 text-amber-400 hover:bg-slate-700/80 border border-amber-500/30'
+                            : 'bg-slate-800/60 text-purple-300 hover:bg-slate-700/80'
+                      }`}
+                    >
+                      <div className="flex items-center justify-between">
+                        <span>{pack.order}. {pack.name.split(' ')[0]}</span>
+                        {isFinale && (
+                          <span className="ml-1 text-[10px] font-bold tracking-wider opacity-75">
+                            ✦
+                          </span>
+                        )}
+                      </div>
+                      {isFinale && (
+                        <div className="absolute -top-1 -right-1 w-2 h-2 bg-amber-400 rounded-full animate-pulse" />
+                      )}
+                    </button>
+                  );
+                })}
               </div>
 
               <div className="flex gap-2 mb-3">

@@ -1,0 +1,88 @@
+{
+  "id": "duality-threshold",
+  "name": "Duality — The Unseen & The Seen",
+  "wave": 3,
+  "order": 7,
+  "description": "Where shadow meets form. The threshold revealed.",
+  "powerRating": 7,
+  "motionProfile": "transcendent",
+  "essenceLabels": [
+    "threshold",
+    "duality",
+    "revelation",
+    "axis",
+    "finale",
+    "recognition",
+    "crossing",
+    "emergence"
+  ],
+  "telosAlignment": [
+    "recognition",
+    "integration",
+    "transcendence",
+    "witness",
+    "completion"
+  ],
+  "capabilities": [
+    "dual-layer-rendering",
+    "threshold-visualization",
+    "metric-driven-transition",
+    "breathing-oscillation",
+    "interference-shimmer"
+  ],
+  "integrityScore": 1.0,
+  "author": "Sacred Shifter",
+  "version": "1.0.0",
+  "created": "2025-11-11",
+  "visualElements": {
+    "unseenLayer": [
+      "atmospheric-depth",
+      "curl-noise-currents",
+      "sparse-particles",
+      "liminal-threads",
+      "pregnant-emptiness"
+    ],
+    "seenLayer": [
+      "flower-of-life",
+      "hexagonal-lattice",
+      "synaptic-nodes",
+      "neural-connections",
+      "interference-patterns",
+      "golden-ratio-spiral"
+    ],
+    "dualityMechanics": {
+      "coherenceDriven": "Blend factor from unseen to seen",
+      "stillnessShapes": "Transition smoothness (sharp vs gentle)",
+      "gainIntensifies": "Bloom and brightness of seen layer",
+      "breathingPulse": "Mid-coherence oscillation",
+      "interferenceZone": "Shimmer where layers meet"
+    }
+  },
+  "metricBehavior": {
+    "coherence": {
+      "low": "Unseen dominant - darkness, potential",
+      "mid": "Threshold oscillation - the crossing itself",
+      "high": "Seen dominant - light, structure"
+    },
+    "stillness": {
+      "low": "Abrupt polarity snaps - dramatic shifts",
+      "high": "Smooth crossfades - gentle transitions"
+    },
+    "gain": {
+      "low": "Forms collapse back to unseen",
+      "high": "Forms stabilize and glow"
+    }
+  },
+  "philosophical": {
+    "essence": "The moment consciousness recognizes itself",
+    "metaphor": "Wave-particle duality as consciousness principle",
+    "revelation": "Where the unexpressed becomes shape",
+    "position": "The axis where all states converge"
+  },
+  "special": {
+    "isFinale": true,
+    "badge": "WAVE 3 • FINALE",
+    "accentColor": "gold",
+    "knowledgeCardVariant": "expanded-prestige"
+  }
+}
