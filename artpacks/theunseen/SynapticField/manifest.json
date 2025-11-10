@@ -1,0 +1,41 @@
+{
+  "id": "synaptic-field",
+  "name": "Synaptic Field",
+  "version": "1.0.0",
+  "author": "Sacred Shifter Collective",
+  "description": "Intelligence forming. Nodes light up. Connections pulse with electrical fire. You witness synaptic activity across a cosmic brain. Coherence reveals symmetry. Gain reveals faster pulses. This is consciousness recognizing itself.",
+  "esm_url": "index.js",
+  "minEngine": "1.0.0",
+  "series": {
+    "id": "the-unseen",
+    "name": "The Unseen Series",
+    "order": 5,
+    "wave": 2
+  },
+  "tags": ["neural", "synaptic", "intelligence", "nodes", "connections", "electric", "brain", "unseen"],
+  "telos": ["facilitate-transcendence", "enable-creative-expression", "enhance-collective-field"],
+  "essenceLabels": ["intelligent", "reactive", "dynamic", "electric"],
+  "motion_profile": "dynamic",
+  "power_rating": 4,
+  "aesthetic_coherence_score": 1.0,
+  "color_palette": {
+    "primary": "#0a0a0f",
+    "secondary": "#1a1a2e",
+    "accent": "#4a4a7a",
+    "highlight": "#7a7aaa"
+  },
+  "safety": {
+    "maxStrobeHz": 2.5,
+    "photosensitiveWarning": false,
+    "lowSensoryFriendly": false,
+    "maxBrightness": 0.8,
+    "maxSaturation": 0.7
+  },
+  "performance": {
+    "targetFPS": 60,
+    "gpuIntensity": "medium",
+    "hasLOD": true,
+    "hasFallback": true
+  },
+  "metaphysicalNotes": "Synaptic Field mirrors the structure of consciousness itself. Group coherence reveals symmetrical patterns. Individual gain increases pulse speed. Intelligence is not separate from awareness—it IS awareness organizing itself."
+}

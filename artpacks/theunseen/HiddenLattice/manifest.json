@@ -1,0 +1,41 @@
+{
+  "id": "hidden-lattice",
+  "name": "Hidden Lattice",
+  "version": "1.0.0",
+  "author": "Sacred Shifter Collective",
+  "description": "The unseen geometry behind existence starts emerging. Low-opacity sacred geometry grids and crystalline lines reveal themselves only under coherence. The blueprint of reality becomes visible. Patterns that were always there, now seen.",
+  "esm_url": "index.js",
+  "minEngine": "1.0.0",
+  "series": {
+    "id": "the-unseen",
+    "name": "The Unseen Series",
+    "order": 4,
+    "wave": 2
+  },
+  "tags": ["sacred-geometry", "lattice", "crystalline", "structured", "blueprint", "mystical", "unseen"],
+  "telos": ["facilitate-transcendence", "support-meditative-states", "enable-creative-expression"],
+  "essenceLabels": ["structured", "geometric", "reactive", "mystical"],
+  "motion_profile": "structured",
+  "power_rating": 3,
+  "aesthetic_coherence_score": 1.0,
+  "color_palette": {
+    "primary": "#0a0a0f",
+    "secondary": "#1a1a2e",
+    "accent": "#3a3a5a",
+    "highlight": "#6a6a9a"
+  },
+  "safety": {
+    "maxStrobeHz": 1.5,
+    "photosensitiveWarning": false,
+    "lowSensoryFriendly": true,
+    "maxBrightness": 0.7,
+    "maxSaturation": 0.6
+  },
+  "performance": {
+    "targetFPS": 60,
+    "gpuIntensity": "medium",
+    "hasLOD": true,
+    "hasFallback": true
+  },
+  "metaphysicalNotes": "Hidden Lattice reveals the geometric blueprint underlying reality. Stillness creates stability. Coherence creates clarity. The sacred structures that organize existence become visible through sustained attention."
+}

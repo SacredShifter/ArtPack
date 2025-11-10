@@ -1,0 +1,41 @@
+{
+  "id": "interference-realm",
+  "name": "Interference Realm",
+  "version": "1.0.0",
+  "author": "Sacred Shifter Collective",
+  "description": "Wave interactions create emergent form. Slow wavefronts collide and create resonance bands. Fluid interference patterns reveal themselves. Coherence stabilizes the waves. Breath modulates amplitude. This is the realm where separate becomes entangled.",
+  "esm_url": "index.js",
+  "minEngine": "1.0.0",
+  "series": {
+    "id": "the-unseen",
+    "name": "The Unseen Series",
+    "order": 6,
+    "wave": 2
+  },
+  "tags": ["waves", "interference", "resonance", "fluid", "hypnotic", "scientific", "unseen"],
+  "telos": ["facilitate-transcendence", "support-meditative-states", "enhance-collective-field"],
+  "essenceLabels": ["hypnotic", "reactive", "fluid", "scientific"],
+  "motion_profile": "flowing",
+  "power_rating": 3,
+  "aesthetic_coherence_score": 1.0,
+  "color_palette": {
+    "primary": "#0a0a0f",
+    "secondary": "#1a1a2e",
+    "accent": "#3a3a6a",
+    "highlight": "#6a6aaa"
+  },
+  "safety": {
+    "maxStrobeHz": 2.0,
+    "photosensitiveWarning": false,
+    "lowSensoryFriendly": true,
+    "maxBrightness": 0.75,
+    "maxSaturation": 0.65
+  },
+  "performance": {
+    "targetFPS": 60,
+    "gpuIntensity": "medium",
+    "hasLOD": true,
+    "hasFallback": true
+  },
+  "metaphysicalNotes": "Interference Realm demonstrates entanglement. Two waves meet and create something neither contained alone. Coherence creates stable standing waves. This is the physics of consciousness merging."
+}
