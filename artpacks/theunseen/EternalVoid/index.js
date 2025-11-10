@@ -77,19 +77,19 @@ export function register(engine) {
         float portal = 1.0 - smoothstep(0.0, 0.8 + breath * 0.15, dist);
         portal = pow(portal, 2.5 + uVoidDepth);
 
-        vec3 voidColor = vec3(0.01, 0.005, 0.015);
-        vec3 portalColor = vec3(0.04, 0.015, 0.06);
+        vec3 voidColor = vec3(0.03, 0.015, 0.04);
+        vec3 portalColor = vec3(0.08, 0.03, 0.12);
 
-        vec3 color = mix(voidColor, portalColor, portal * 0.25);
+        vec3 color = mix(voidColor, portalColor, portal * 0.4);
 
-        color += voidTex * uCoherence * 0.12 * vec3(0.08, 0.04, 0.12);
+        color += voidTex * uCoherence * 0.2 * vec3(0.12, 0.06, 0.18);
 
         float vignette = smoothstep(1.2, 0.3, dist);
-        color *= vignette * 0.7 + 0.3;
+        color *= vignette * 0.8 + 0.3;
 
-        color *= 0.92 + breath * 0.04;
+        color *= 0.95 + breath * 0.08;
 
-        color *= mix(1.0, 0.6, 1.0 - uStillness);
+        color *= mix(1.0, 0.7, 1.0 - uStillness);
 
         gl_FragColor = vec4(color, 1.0);
       }

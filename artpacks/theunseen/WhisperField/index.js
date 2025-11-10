@@ -106,14 +106,14 @@ export function register(engine) {
 
       float revealedFog = fogDensity * visibility * vignette;
 
-      vec3 baseColor = vec3(0.02, 0.015, 0.025);
-      vec3 fogColor = vec3(0.08, 0.05, 0.12);
+      vec3 baseColor = vec3(0.04, 0.03, 0.05);
+      vec3 fogColor = vec3(0.12, 0.08, 0.18);
 
-      vec3 color = mix(baseColor, fogColor, revealedFog * 0.4);
+      vec3 color = mix(baseColor, fogColor, revealedFog * 0.6);
 
-      color *= intensity * (0.95 + breath * 0.05);
+      color *= intensity * (0.95 + breath * 0.08);
 
-      color *= 0.3;
+      color *= 0.55;
 
       gl_FragColor = vec4(color, 1.0);
     }
