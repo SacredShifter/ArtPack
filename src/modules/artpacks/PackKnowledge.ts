@@ -1,250 +1,128 @@
 /**
  * The Unseen Series - Pack Knowledge System
- * Generates educational knowledge cards for captured consciousness artifacts
+ * Museum-quality knowledge cards for consciousness artifacts
  */
 
 export interface PackKnowledgeTemplate {
   title: string;
   essence: string;
-  elements: {
-    name: string;
-    description: string;
-    symbolism: string;
-  }[];
-  science: string[];
+  visualNote: string;
   getInterpretation: (coherence: number, stillness: number) => string;
+  foundation: string;
 }
 
-function interpretCoherence(coherence: number): string {
-  if (coherence < 20) return "Pre-formation state. Chaos reigns. Patterns dormant.";
-  if (coherence < 40) return "Initial stirrings. Order begins to emerge from chaos.";
-  if (coherence < 60) return "Stabilizing. Patterns becoming visible and coherent.";
-  if (coherence < 80) return "High clarity. Strong pattern recognition and structure.";
-  return "Crystalline perfection. Maximum pattern visibility achieved.";
-}
+function interpretState(coherence: number, stillness: number): string {
+  const cDesc =
+    coherence < 20 ? "Pre-formation. Chaos holds the field." :
+    coherence < 40 ? "Order emerging. Patterns forming beneath surface." :
+    coherence < 60 ? "Equilibrium. Structure becoming visible." :
+    coherence < 80 ? "Clarity. Strong pattern recognition." :
+    "Crystalline. Maximum resolution achieved.";
 
-function interpretStillness(stillness: number): string {
-  if (stillness < 20) return "Rapid flux. High energy, dynamic transformation.";
-  if (stillness < 40) return "Active flow. Movement with emerging stability.";
-  if (stillness < 60) return "Balanced. Dynamic stillness, motion in equilibrium.";
-  if (stillness < 80) return "Deep calm. Subtle movement within profound peace.";
-  return "Absolute stillness. Pure presence, no disturbance.";
+  const sDesc =
+    stillness < 20 ? "Rapid flux. High kinetic energy." :
+    stillness < 40 ? "Active flow. Motion seeking form." :
+    stillness < 60 ? "Poised between rest and motion." :
+    stillness < 80 ? "Deep calm. Subtle pulse beneath stillness." :
+    "Absolute quiet. Pure presence.";
+
+  return `Coherence: ${coherence.toFixed(0)}% — ${cDesc}\nStillness: ${stillness.toFixed(0)}% — ${sDesc}`;
 }
 
 export const PACK_KNOWLEDGE: Record<string, PackKnowledgeTemplate> = {
   'eternal-void': {
     title: 'ETERNAL VOID',
-    essence: 'The primordial darkness before creation. Pure potential waiting to manifest. This is consciousness in its most fundamental state - aware, but not yet formed.',
-    elements: [
-      {
-        name: 'Atmospheric Depth',
-        description: 'Layered darkness with subtle gradients',
-        symbolism: 'The infinite depths of unmanifest consciousness'
-      },
-      {
-        name: 'Particle Fields',
-        description: 'Sparse luminous points in darkness',
-        symbolism: 'First sparks of awareness in the void'
-      },
-      {
-        name: 'Pregnant Emptiness',
-        description: 'Space that feels full despite being empty',
-        symbolism: 'The zero-point field of infinite possibility'
-      }
-    ],
-    science: [
-      'Quantum vacuum fluctuations - emptiness that seethes with potential',
-      'Pre-cognitive awareness - consciousness before thought',
-      'The void in meditation - dissolution of form into pure being'
-    ],
+    essence: 'The primordial dark. Not absence, but pregnant silence — the field before form, awareness before thought. Here, consciousness rests in its most fundamental state, watching itself from within the unseen.',
+    visualNote: 'Atmospheric depths. Sparse luminous points suspended in darkness. Space that feels full despite emptiness. The void breathes.',
+    foundation: 'Quantum vacuum potential. Pre-cognitive awareness. Zero-point field of infinite possibility. The silence before the first vibration.',
     getInterpretation: (coherence, stillness) => {
       if (coherence < 30 && stillness > 70) {
-        return "Deep meditation state. You've touched the void where consciousness rests before manifestation.";
+        return "Deep meditation state achieved. You have touched the threshold where consciousness dissolves into pure being.";
       }
       if (coherence > 60) {
-        return "Even the void reveals patterns at high coherence. The emptiness becomes luminous.";
+        return "Even emptiness reveals structure at high coherence. The void becomes luminous. This is the paradox.";
       }
-      return "The void invites you to release all form and rest in pure awareness.";
+      return "The void invites surrender. Release form. Rest in the dark that knows itself.";
     }
   },
 
   'whisper-field': {
     title: 'WHISPER FIELD',
-    essence: 'The first subtle movements of consciousness awakening. Like breath stirring still air, these are the initial currents that precede all form and thought.',
-    elements: [
-      {
-        name: 'Flow Fields',
-        description: 'Gentle, organic movement patterns',
-        symbolism: 'The breath of consciousness, subtle energy currents'
-      },
-      {
-        name: 'Curl Noise',
-        description: 'Smooth, turbulence-free flow',
-        symbolism: 'Natural, effortless movement without resistance'
-      },
-      {
-        name: 'Ultra-Soft Gradients',
-        description: 'Barely perceptible transitions',
-        symbolism: 'The liminal space between states'
-      }
-    ],
-    science: [
-      'Morphogenetic fields - invisible patterns that guide formation',
-      'Subtle body awareness - sensing energy before physical sensation',
-      'Pre-cognitive sensing - knowing before thinking'
-    ],
+    essence: 'The earliest stirrings of awareness moving through the unseen. A quiet pulse beneath the dark — not yet form, not yet thought, only potential shifting toward expression.',
+    visualNote: 'Barely perceptible currents. Soft modulation in shadow. Shapes half-formed, dissolving, reforming. The whisper before the rise.',
+    foundation: 'Morphogenetic fields guiding pre-formation. Subtle energy preceding physical sensation. The threshold where knowing precedes thinking.',
     getInterpretation: (coherence, stillness) => {
       if (stillness < 30) {
-        return "High movement energy. Your consciousness is actively exploring, dancing through possibility space.";
+        return "High kinetic state. Consciousness explores itself through movement, dancing at the edge of manifestation.";
       }
       if (coherence > 70 && stillness > 70) {
-        return "Perfect balance. Movement within stillness - the whisper of awareness itself.";
+        return "Equilibrium achieved. Movement within stillness. The whisper becomes audible without breaking silence.";
       }
-      return "Listen to the subtle currents. Consciousness always moves, even in silence.";
+      return "Listen beneath the surface. Even in quiet, consciousness moves. Attend to what stirs.";
     }
   },
 
   'liminal-threads': {
     title: 'LIMINAL THREADS',
-    essence: 'The invisible web connecting all things. These filaments reveal the interconnected nature of consciousness - how every point touches every other point through the fabric of awareness.',
-    elements: [
-      {
-        name: 'Connection Strands',
-        description: 'Luminous threads weaving through space',
-        symbolism: 'Quantum entanglement, non-local connections'
-      },
-      {
-        name: 'Web Structure',
-        description: 'Organic network of intersecting paths',
-        symbolism: 'Mycelial intelligence, distributed consciousness'
-      },
-      {
-        name: 'Threshold Points',
-        description: 'Nodes where threads converge',
-        symbolism: 'Moments of heightened connection and coherence'
-      }
-    ],
-    science: [
-      'Quantum entanglement - instant connection across any distance',
-      'Mycelial networks - decentralized intelligence in nature',
-      'Collective coherence - synchronized consciousness fields'
-    ],
+    essence: 'The web revealed. Invisible currents become visible filaments — evidence of connection that precedes separation. Each point touches every other point through the architecture of awareness itself.',
+    visualNote: 'Luminous strands weaving through darkness. Intersection nodes pulsing with convergence. The network of all-touching-all, made visible.',
+    foundation: 'Non-local connection. Quantum entanglement as metaphor and mechanism. Mycelial intelligence. Distributed consciousness operating as unified field.',
     getInterpretation: (coherence, stillness) => {
       if (coherence > 60) {
-        return "The network becomes visible. You're seeing the infrastructure of interconnection itself.";
+        return "The infrastructure becomes visible. This is the lattice underlying apparent separation — always present, now seen.";
       }
       if (stillness < 40) {
-        return "Active weaving. New connections forming, the web restructuring in real-time.";
+        return "Active weaving. New connections forming in real-time. The web restructures itself through your attention.";
       }
-      return "The threads are always there, even when invisible. Everything is connected.";
+      return "Connection precedes isolation. The threads are always present, whether visible or not. You are held.";
     }
   },
 
   'hidden-lattice': {
     title: 'HIDDEN LATTICE',
-    essence: 'The sacred geometric blueprint underlying reality. These crystalline structures are the universal organizing principles - how consciousness creates order from chaos.',
-    elements: [
-      {
-        name: 'Flower of Life',
-        description: 'Seven overlapping circles forming perfect symmetry',
-        symbolism: 'The seed pattern of creation, found across cultures and cosmos'
-      },
-      {
-        name: 'Hexagonal Grid',
-        description: 'Six-fold symmetry creating honeycomb structure',
-        symbolism: 'Maximum efficiency pattern, divine proportion'
-      },
-      {
-        name: 'Layered Depth',
-        description: 'Multiple geometric planes creating parallax',
-        symbolism: 'Dimensional awareness, multi-level consciousness'
-      }
-    ],
-    science: [
-      'Platonic solids - the five perfect geometric forms',
-      'Cymatics - sound creating visible geometric patterns',
-      'Information architecture - how consciousness structures data'
-    ],
+    essence: 'Sacred architecture made visible. Geometric principles that organize chaos into cosmos — the blueprint consciousness uses to structure itself into recognizable form.',
+    visualNote: 'Overlapping circles. Hexagonal grids. Crystalline layers creating dimensional depth. Order revealing itself through symmetry and proportion.',
+    foundation: 'Platonic forms as consciousness scaffolding. Cymatics — sound creating geometry. The mathematics of manifestation.',
     getInterpretation: (coherence, stillness) => {
       if (coherence > 80) {
-        return "Crystalline clarity. The hidden order is fully revealed. This is the architecture of consciousness.";
+        return "Maximum clarity achieved. The hidden order stands fully revealed. This is the architecture beneath all appearance.";
       }
       if (coherence < 40) {
-        return "The lattice remains hidden. Increase coherence to see the underlying geometric truth.";
+        return "The lattice remains veiled. Increase coherence to witness the geometric truth that structures reality.";
       }
-      return "Sacred geometry is always present, waiting to be recognized. Look deeper.";
+      return "Sacred geometry is always present beneath the surface. It does not appear — it is revealed.";
     }
   },
 
   'synaptic-field': {
     title: 'SYNAPTIC FIELD',
-    essence: 'Intelligence awakening. This is consciousness lighting up like a neural network, thought-forms emerging, connections firing. The moment awareness becomes self-aware.',
-    elements: [
-      {
-        name: 'Neural Nodes',
-        description: 'Glowing points of concentrated awareness',
-        symbolism: 'Individual moments of insight and recognition'
-      },
-      {
-        name: 'Firing Patterns',
-        description: 'Cascading waves of activation',
-        symbolism: 'Thought propagation, idea transmission'
-      },
-      {
-        name: 'Network Density',
-        description: 'Clusters of high interconnection',
-        symbolism: 'Collective intelligence, emergent complexity'
-      }
-    ],
-    science: [
-      'Neural networks - biological and artificial intelligence patterns',
-      'Emergence - how complexity arises from simple interactions',
-      'Collective intelligence - group minds thinking as one'
-    ],
+    essence: 'Intelligence awakening to itself. The moment awareness recognizes its own patterns — thought-forms emerging, connections firing, the network becoming conscious of being a network.',
+    visualNote: 'Glowing nodes of concentrated presence. Cascading activation patterns. Dense interconnection creating emergent complexity.',
+    foundation: 'Neural architecture as consciousness template. Emergence from simple rules. Collective intelligence operating as singular mind.',
     getInterpretation: (coherence, stillness) => {
       if (coherence > 70 && stillness < 30) {
-        return "High activity, high clarity. Rapid-fire insights. Your consciousness is actively processing.";
+        return "High activity, high clarity. Rapid insight state. The network processes itself at speed, watching its own thinking.";
       }
       if (stillness > 70) {
-        return "Quiet mind, active awareness. Consciousness observing itself without disturbance.";
+        return "Quiet observation. The network rests while remaining aware. Consciousness witnesses without disturbing itself.";
       }
-      return "The network is always thinking. Watch the patterns of your own awareness.";
+      return "Intelligence is pattern recognizing pattern. Watch the watching. This is the recursion.";
     }
   },
 
   'interference-realm': {
     title: 'INTERFERENCE REALM',
-    essence: 'Where waves meet and create reality. This is the principle of how consciousness manifests form - through the interference of patterns, resonance creates standing waves of being.',
-    elements: [
-      {
-        name: 'Wave Patterns',
-        description: 'Concentric ripples propagating outward',
-        symbolism: 'Consciousness as wave function, probability fields'
-      },
-      {
-        name: 'Resonance Bands',
-        description: 'Zones where frequencies align',
-        symbolism: 'Harmonic coherence, synchronized states'
-      },
-      {
-        name: 'Interference Nodes',
-        description: 'Points where waves amplify or cancel',
-        symbolism: 'Manifestation points, where form emerges from pattern'
-      }
-    ],
-    science: [
-      'Wave interference - constructive and destructive superposition',
-      'Standing waves - stable patterns from dynamic oscillation',
-      'Resonance theory - how frequencies amplify through alignment'
-    ],
+    essence: 'Where waves meet and reality manifests. Form emerges through interference — not from substance, but from patterns meeting patterns, creating standing waves of being.',
+    visualNote: 'Concentric ripples propagating outward. Resonance zones where frequencies align. Nodes of constructive and destructive interference.',
+    foundation: 'Wave superposition creating form from oscillation. Standing waves as stable patterns. Resonance theory — alignment amplifies.',
     getInterpretation: (coherence, stillness) => {
       if (coherence > 60) {
-        return "Strong resonance. Waves aligned, interference patterns clear. You're in phase with the field.";
+        return "Strong resonance achieved. Waves aligned. Interference patterns clear. You are in phase with the field.";
       }
       if (stillness < 30) {
-        return "High turbulence. Many frequencies competing. Chaos before coherence.";
+        return "High turbulence. Multiple frequencies competing. The chaos before coherence — necessary, not wrong.";
       }
-      return "Everything is vibration. Form emerges where waves meet in harmony.";
+      return "Everything vibrates. Form is frozen music. Where patterns meet, reality appears.";
     }
   }
 };
@@ -271,25 +149,28 @@ export function generateKnowledgeCard(
   });
 
   return `${pack.title}
-Captured: ${formattedDate} • ${formattedTime}
+
+Captured • ${formattedDate} • ${formattedTime}
 
 CONSCIOUSNESS STATE
-Coherence: ${coherence.toFixed(0)}% — ${interpretCoherence(coherence)}
-Stillness: ${stillness.toFixed(0)}% — ${interpretStillness(stillness)}
+${interpretState(coherence, stillness)}
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 ESSENCE
 ${pack.essence}
 
 VISUAL ELEMENTS
-${pack.elements.map(el => `• ${el.name}\n  ${el.description}\n  → ${el.symbolism}`).join('\n\n')}
+${pack.visualNote}
 
-WHAT THIS REVEALS
+REVELATION
 ${pack.getInterpretation(coherence, stillness)}
 
-METAPHYSICAL SCIENCE
-${pack.science.map(s => `• ${s}`).join('\n')}
+FOUNDATION
+${pack.foundation}
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
 The Unseen Series — Sacred Shifter
-Consciousness made visible through geometry and light`;
+Consciousness made visible`;
 }

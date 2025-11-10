@@ -43,17 +43,23 @@ export class KnowledgeCardCompositor {
     const overlayHeight = canvas.height * 0.35;
     const overlayY = canvas.height - overlayHeight;
 
-    // Draw semi-transparent overlay
+    // Draw refined overlay with gradient wash
     const gradient = ctx.createLinearGradient(0, overlayY, 0, canvas.height);
-    gradient.addColorStop(0, `rgba(10, 10, 15, ${overlayOpacity * 0.85})`);
-    gradient.addColorStop(1, `rgba(10, 10, 15, ${overlayOpacity})`);
+    gradient.addColorStop(0, `rgba(6, 8, 12, ${overlayOpacity * 0.75})`);
+    gradient.addColorStop(0.4, `rgba(10, 12, 16, ${overlayOpacity * 0.92})`);
+    gradient.addColorStop(1, `rgba(8, 10, 14, ${overlayOpacity * 0.96})`);
 
     ctx.fillStyle = gradient;
     ctx.fillRect(0, overlayY, canvas.width, overlayHeight);
 
-    // Add subtle top border
-    ctx.strokeStyle = 'rgba(255, 255, 255, 0.15)';
-    ctx.lineWidth = 1;
+    // Add refined border with subtle glow
+    const borderGradient = ctx.createLinearGradient(0, overlayY - 1, 0, overlayY + 3);
+    borderGradient.addColorStop(0, 'rgba(255, 255, 255, 0)');
+    borderGradient.addColorStop(0.5, 'rgba(255, 255, 255, 0.28)');
+    borderGradient.addColorStop(1, 'rgba(255, 255, 255, 0.08)');
+
+    ctx.strokeStyle = borderGradient;
+    ctx.lineWidth = 1.5;
     ctx.beginPath();
     ctx.moveTo(0, overlayY);
     ctx.lineTo(canvas.width, overlayY);
@@ -96,43 +102,57 @@ export class KnowledgeCardCompositor {
     for (const line of lines) {
       if (currentY > layout.y + layout.height) break;
 
-      // Style based on line content
+      // Style based on line content with refined hierarchy
       if (line.match(/^[A-Z\s]{10,}$/)) {
-        // ALL CAPS HEADERS
-        ctx.font = `bold ${layout.fontSize * 1.2}px "Inter", system-ui, sans-serif`;
-        ctx.fillStyle = 'rgba(255, 255, 255, 0.95)';
-        ctx.letterSpacing = '0.1em';
+        // ALL CAPS HEADERS - Maximum prestige
+        ctx.font = `700 ${layout.fontSize * 1.25}px "Inter", -apple-system, system-ui, sans-serif`;
+        ctx.fillStyle = 'rgba(255, 255, 255, 0.97)';
+        ctx.letterSpacing = '0.15em';
+        // Add subtle text shadow for depth
+        ctx.shadowColor = 'rgba(0, 0, 0, 0.5)';
+        ctx.shadowBlur = 2;
+        ctx.shadowOffsetY = 1;
       } else if (line.includes('━━━')) {
-        // Separator line
+        // Separator line with refined styling
         const separatorY = currentY + (layout.fontSize * layout.lineHeight / 2);
-        ctx.strokeStyle = 'rgba(255, 255, 255, 0.2)';
-        ctx.lineWidth = 1;
+        const sepGradient = ctx.createLinearGradient(layout.x, 0, layout.x + layout.width, 0);
+        sepGradient.addColorStop(0, 'rgba(255, 255, 255, 0)');
+        sepGradient.addColorStop(0.5, 'rgba(255, 255, 255, 0.22)');
+        sepGradient.addColorStop(1, 'rgba(255, 255, 255, 0)');
+        ctx.strokeStyle = sepGradient;
+        ctx.lineWidth = 0.5;
         ctx.beginPath();
         ctx.moveTo(layout.x, separatorY);
         ctx.lineTo(layout.x + layout.width, separatorY);
         ctx.stroke();
-        currentY += layout.fontSize * layout.lineHeight;
+        currentY += layout.fontSize * layout.lineHeight * 0.8;
         continue;
-      } else if (line.startsWith('•')) {
-        // Bullet points
-        ctx.font = `${layout.fontSize}px "Inter", system-ui, sans-serif`;
-        ctx.fillStyle = 'rgba(255, 255, 255, 0.8)';
-      } else if (line.startsWith('  →')) {
-        // Symbolism indent
-        ctx.font = `italic ${layout.fontSize * 0.95}px "Inter", system-ui, sans-serif`;
-        ctx.fillStyle = 'rgba(200, 220, 255, 0.75)';
-      } else if (line.startsWith('  ')) {
-        // Regular indent
-        ctx.font = `${layout.fontSize * 0.95}px "Inter", system-ui, sans-serif`;
-        ctx.fillStyle = 'rgba(255, 255, 255, 0.75)';
+      } else if (line.startsWith('Captured •') || line.startsWith('The Unseen Series')) {
+        // Metadata and branding - subtle
+        ctx.font = `400 ${layout.fontSize * 0.9}px "Inter", system-ui, sans-serif`;
+        ctx.fillStyle = 'rgba(255, 255, 255, 0.65)';
+        ctx.letterSpacing = '0.05em';
+        ctx.shadowColor = 'transparent';
+        ctx.shadowBlur = 0;
       } else if (line.includes(':')) {
-        // Key-value pairs
-        ctx.font = `${layout.fontSize}px "Inter", system-ui, sans-serif`;
-        ctx.fillStyle = 'rgba(255, 255, 255, 0.85)';
+        // Key-value pairs - Consciousness State metrics
+        ctx.font = `500 ${layout.fontSize}px "Inter", system-ui, sans-serif`;
+        ctx.fillStyle = 'rgba(255, 255, 255, 0.90)';
+        ctx.shadowColor = 'transparent';
+        ctx.shadowBlur = 0;
+      } else if (line.match(/^(ESSENCE|VISUAL ELEMENTS|REVELATION|FOUNDATION)$/)) {
+        // Section headers - prestigious
+        ctx.font = `600 ${layout.fontSize * 1.05}px "Inter", system-ui, sans-serif`;
+        ctx.fillStyle = 'rgba(255, 255, 255, 0.92)';
+        ctx.letterSpacing = '0.12em';
+        ctx.shadowColor = 'transparent';
+        ctx.shadowBlur = 0;
       } else {
-        // Body text
-        ctx.font = `${layout.fontSize}px "Inter", system-ui, sans-serif`;
-        ctx.fillStyle = 'rgba(255, 255, 255, 0.8)';
+        // Body text - clean, readable
+        ctx.font = `400 ${layout.fontSize}px "Inter", system-ui, sans-serif`;
+        ctx.fillStyle = 'rgba(255, 255, 255, 0.82)';
+        ctx.shadowColor = 'transparent';
+        ctx.shadowBlur = 0;
       }
 
       // Word wrap long lines
