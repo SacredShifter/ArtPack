@@ -370,31 +370,42 @@ export function register(engine) {
     }
   `;
 
-  const geometry = new THREE.PlaneGeometry(20, 20);
-  const material = new THREE.ShaderMaterial({
+  const dualityShader = new THREE.ShaderMaterial({
     uniforms,
     vertexShader,
     fragmentShader,
-    transparent: true,
+    transparent: false
   });
 
-  const mesh = new THREE.Mesh(geometry, material);
+  engine.registerMaterial('dualityMaterial', dualityShader);
 
-  return {
-    meshes: [mesh],
-    tick: (deltaTime, elapsedTime, params) => {
-      uniforms.uTime.value = elapsedTime;
-      uniforms.uCoherence.value = params.coherence;
-      uniforms.uStillness.value = params.stillness;
-      uniforms.uGain.value = params.gain;
-      uniforms.uPhase.value = params.phase;
+  engine.registerNode('dualityPlane', () => {
+    const geometry = new THREE.PlaneGeometry(20, 20, 1, 1);
+    return new THREE.Mesh(geometry, dualityShader);
+  });
 
-      const aspect = window.innerWidth / window.innerHeight;
-      uniforms.uResolution.value.set(window.innerWidth, window.innerHeight);
-    },
-    destroy: () => {
-      geometry.dispose();
-      material.dispose();
-    },
-  };
+  engine.setParamMapper((region, coherence) => {
+    return {
+      uCoherence: coherence.individual || coherence.amplitude || 0,
+      uStillness: coherence.stillness || 0.5,
+      uGain: 0.5,
+      uPhase: coherence.phase || 0,
+    };
+  });
+
+  let time = 0;
+  engine.onFrame((deltaTime, t, params) => {
+    time += deltaTime * 0.5;
+
+    dualityShader.uniforms.uTime.value = time;
+    dualityShader.uniforms.uCoherence.value = params.uCoherence || 0;
+    dualityShader.uniforms.uStillness.value = params.uStillness || 0.5;
+    dualityShader.uniforms.uGain.value = params.uGain || 0.5;
+    dualityShader.uniforms.uPhase.value = params.uPhase || 0;
+    dualityShader.uniforms.uSeed.value = region?.entropy || 50;
+
+    if (window.innerWidth && window.innerHeight) {
+      dualityShader.uniforms.uResolution.value.set(window.innerWidth, window.innerHeight);
+    }
+  });
 }
