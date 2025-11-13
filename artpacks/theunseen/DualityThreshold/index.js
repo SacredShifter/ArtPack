@@ -402,7 +402,7 @@ export function register(engine) {
     dualityShader.uniforms.uStillness.value = params.uStillness || 0.5;
     dualityShader.uniforms.uGain.value = params.uGain || 0.5;
     dualityShader.uniforms.uPhase.value = params.uPhase || 0;
-    dualityShader.uniforms.uSeed.value = region?.entropy || 50;
+    dualityShader.uniforms.uSeed.value = 50;
 
     if (window.innerWidth && window.innerHeight) {
       dualityShader.uniforms.uResolution.value.set(window.innerWidth, window.innerHeight);
