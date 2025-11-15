@@ -60,19 +60,30 @@ float sdCircle(vec2 p, vec2 center, float radius) {
   return length(p - center) - radius;
 }
 
-float flowerOfLifeCircle(vec2 p, vec2 center, float radius, float thickness) {
+// Analog imperfect circle - wobbles slightly
+float flowerOfLifeCircle(vec2 p, vec2 center, float radius, float thickness, float time) {
+  // Add fractional wobble (0.2% variation)
+  float angle = atan(p.y - center.y, p.x - center.x);
+  float wobble = snoise(vec2(angle * 8.0, time * 0.3)) * 0.002 * radius;
+  radius += wobble;
+
   float d = abs(sdCircle(p, center, radius)) - thickness;
-  return smoothstep(0.01, 0.0, d);
+
+  // Micro-blur at edges
+  float blur = 0.015;
+  return smoothstep(blur, 0.0, d);
 }
 
-float flowerOfLife(vec2 p, vec2 center, float radius, float thickness) {
+float flowerOfLife(vec2 p, vec2 center, float radius, float thickness, float time) {
   float pattern = 0.0;
-  pattern += flowerOfLifeCircle(p, center, radius, thickness);
+  pattern += flowerOfLifeCircle(p, center, radius, thickness, time);
 
   for(int i = 0; i < 6; i++) {
     float angle = float(i) * TAU / 6.0;
-    vec2 offset = vec2(cos(angle), sin(angle)) * radius;
-    pattern += flowerOfLifeCircle(p, center + offset, radius, thickness);
+    // Tiny asymmetric variation per petal
+    float angleWobble = snoise(vec2(float(i) * 7.3, time * 0.4)) * 0.003;
+    vec2 offset = vec2(cos(angle + angleWobble), sin(angle + angleWobble)) * radius;
+    pattern += flowerOfLifeCircle(p, center + offset, radius, thickness, time + float(i));
   }
 
   return clamp(pattern, 0.0, 1.0);
@@ -100,6 +111,50 @@ float hash(float p) {
 
 float hash2D(vec2 p) {
   return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453123);
+}
+
+// === ORGANIC REALISM TOOLKIT ===
+
+// Turbulent FBM - chaotic multi-octave noise
+float fbm(vec2 p, float time, int octaves) {
+  float value = 0.0;
+  float amplitude = 0.5;
+  float frequency = 1.0;
+  for(int i = 0; i < 6; i++) {
+    if(i >= octaves) break;
+    // Add distortion per octave for organic feel
+    vec2 distorted = p + curl(p * 0.3 + time * 0.05, time) * 0.2;
+    value += snoise(distorted * frequency) * amplitude;
+    frequency *= 2.0;
+    amplitude *= 0.5;
+  }
+  return value;
+}
+
+// Film grain - analog texture
+float filmGrain(vec2 uv, float time) {
+  vec2 p = uv * 1000.0 + time * 3.0;
+  return hash2D(p) * 2.0 - 1.0;
+}
+
+// Lens vignette - optical falloff
+float lensVignette(vec2 uv, float strength) {
+  vec2 centered = uv * 2.0 - 1.0;
+  float dist = length(centered);
+  return 1.0 - pow(dist, 2.0) * strength;
+}
+
+// Chromatic aberration offset
+vec2 chromaticOffset(vec2 uv, float amount) {
+  vec2 centered = uv - 0.5;
+  float dist = length(centered);
+  return centered * dist * amount;
+}
+
+// Dust particles - lens imperfections
+float dustSpeck(vec2 uv, vec2 speckPos, float size) {
+  float dist = length(uv - speckPos);
+  return smoothstep(size, 0.0, dist);
 }
 `;
 
@@ -158,8 +213,23 @@ export function register(engine) {
     vec3 renderUnseenLayer(vec2 uv, float time, float seed) {
       vec2 p = (uv - 0.5) * 4.0;
 
-      // Soft atmospheric base - brightened for visibility
-      vec3 atmosphere = vec3(0.08, 0.10, 0.14);
+      // === ORGANIC BACKGROUND: Turbulent multi-layer noise ===
+      // Layer 1: Smooth atmospheric base
+      float smooth = fbm(p * 0.8, time * 0.1, 3) * 0.5 + 0.5;
+      // Layer 2: Chaotic turbulence
+      float chaos = fbm(p * 2.3 + vec2(100.0, 50.0), time * 0.15, 4) * 0.5 + 0.5;
+      // Combine with distortion
+      vec2 distortion = vec2(
+        fbm(p * 1.5 + time * 0.08, time, 2),
+        fbm(p * 1.5 - time * 0.08 + 50.0, time, 2)
+      ) * 0.3;
+      p += distortion;
+
+      vec3 atmosphere = mix(
+        vec3(0.05, 0.07, 0.11),
+        vec3(0.12, 0.14, 0.18),
+        smooth * 0.6 + chaos * 0.4
+      );
 
       // Whisper field currents
       vec2 flowPos = p * 2.0;
@@ -193,12 +263,7 @@ export function register(engine) {
       }
 
       // Pregnant emptiness - subtle depth layers
-      float depth = 0.0;
-      for(int i = 0; i < 3; i++) {
-        float fi = float(i);
-        float layer = snoise(p * (0.5 + fi * 0.2) + time * 0.05);
-        depth += pow(max(0.0, layer), 2.0) * (0.1 / (fi + 1.0));
-      }
+      float depth = fbm(p * 0.6, time * 0.05, 3) * 0.5 + 0.5;
 
       // Compose unseen - enhanced visibility
       vec3 unseen = atmosphere;
@@ -219,10 +284,11 @@ export function register(engine) {
       // Base luminosity - increased for visibility
       vec3 luminosity = vec3(0.18, 0.20, 0.24);
 
-      // Sacred geometry - Flower of Life
-      vec2 flowerCenter = vec2(0.0);
+      // Sacred geometry - Flower of Life (now with organic imperfections)
+      // Off-center for asymmetry (3% shift)
+      vec2 flowerCenter = vec2(0.12, -0.08);
       float flowerScale = 0.6 + sin(time * 0.2) * 0.1;
-      float flower = flowerOfLife(p, flowerCenter, flowerScale, 0.015);
+      float flower = flowerOfLife(p, flowerCenter, flowerScale, 0.015, time);
 
       // Hexagonal lattice
       float hex = hexLattice(p * 1.5, 1.0);
@@ -347,16 +413,51 @@ export function register(engine) {
         color = mix(color, color + thresholdColor * 0.15, interferenceZone * shimmer);
       }
 
-      // Vignette for depth
-      vec2 vignetteUv = uv * 2.0 - 1.0;
-      float vignette = 1.0 - dot(vignetteUv, vignetteUv) * 0.3;
+      // === PHOTOGRAPHIC DEGRADATION PASS ===
+
+      // 1. Lens vignette (optical falloff)
+      float vignette = lensVignette(uv, 0.35);
       color *= vignette;
 
-      // Final subtle glow for seen layer
-      if (uCoherence > 0.6) {
-        float glow = pow(dualityFactor, 2.0) * 0.2;
-        color += vec3(0.9, 0.85, 0.95) * glow;
+      // 2. Chromatic aberration (subtle)
+      vec2 chromaticUv = uv + chromaticOffset(uv, 0.002);
+      float redShift = smoothstep(0.4, 0.6, length(uv - 0.5)) * 0.015;
+      color.r = mix(color.r, renderSeenLayer(chromaticUv, time, uSeed, uGain).r, redShift);
+
+      // 3. Bloom around highlights
+      float luminance = dot(color, vec3(0.299, 0.587, 0.114));
+      if (luminance > 0.6) {
+        float bloom = pow(luminance - 0.6, 1.5) * 0.25;
+        color += vec3(0.95, 0.90, 0.85) * bloom;
       }
+
+      // 4. Dust specks (lens imperfections)
+      float dust = 0.0;
+      dust += dustSpeck(uv, vec2(0.23, 0.67), 0.008) * 0.12;
+      dust += dustSpeck(uv, vec2(0.81, 0.34), 0.006) * 0.08;
+      dust += dustSpeck(uv, vec2(0.15, 0.22), 0.005) * 0.10;
+      dust += dustSpeck(uv, vec2(0.92, 0.78), 0.007) * 0.09;
+      color = mix(color, vec3(0.4, 0.4, 0.42), dust);
+
+      // 5. Horizontal lens gradient (sensor response)
+      float lensGrad = smoothstep(0.0, 0.2, uv.y) * smoothstep(1.0, 0.8, uv.y);
+      color *= 0.92 + lensGrad * 0.08;
+
+      // 6. Film grain (analog texture)
+      float grain = filmGrain(uv, time) * 0.035;
+      color += vec3(grain);
+
+      // 7. Subtle glow for high coherence
+      if (uCoherence > 0.6) {
+        float glow = pow(dualityFactor, 2.0) * 0.15;
+        color += vec3(0.88, 0.84, 0.90) * glow;
+      }
+
+      // === NATURAL ELEMENT: Smoke wisps ===
+      float smoke = fbm(uv * 3.0 + vec2(time * 0.02, time * 0.03), time * 0.1, 4);
+      smoke = pow(max(0.0, smoke), 3.0) * 0.08;
+      vec3 smokeColor = vec3(0.15, 0.17, 0.21);
+      color = mix(color, smokeColor, smoke * (1.0 - dualityFactor * 0.7));
 
       gl_FragColor = vec4(color, 1.0);
     }
