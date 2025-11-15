@@ -181,6 +181,8 @@ export function register(engine) {
   };
 
   const fragmentShader = `
+    precision highp float;
+
     ${sharedGLSL}
 
     uniform float uTime;
