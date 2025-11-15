@@ -116,13 +116,24 @@ float hash2D(vec2 p) {
 // === ORGANIC REALISM TOOLKIT ===
 
 // Turbulent FBM - chaotic multi-octave noise
-float fbm(vec2 p, float time, int octaves) {
+float fbm3(vec2 p, float time) {
   float value = 0.0;
   float amplitude = 0.5;
   float frequency = 1.0;
-  for(int i = 0; i < 6; i++) {
-    if(i >= octaves) break;
-    // Add distortion per octave for organic feel
+  for(int i = 0; i < 3; i++) {
+    vec2 distorted = p + curl(p * 0.3 + time * 0.05, time) * 0.2;
+    value += snoise(distorted * frequency) * amplitude;
+    frequency *= 2.0;
+    amplitude *= 0.5;
+  }
+  return value;
+}
+
+float fbm4(vec2 p, float time) {
+  float value = 0.0;
+  float amplitude = 0.5;
+  float frequency = 1.0;
+  for(int i = 0; i < 4; i++) {
     vec2 distorted = p + curl(p * 0.3 + time * 0.05, time) * 0.2;
     value += snoise(distorted * frequency) * amplitude;
     frequency *= 2.0;
@@ -215,13 +226,13 @@ export function register(engine) {
 
       // === ORGANIC BACKGROUND: Turbulent multi-layer noise ===
       // Layer 1: Smooth atmospheric base
-      float smooth = fbm(p * 0.8, time * 0.1, 3) * 0.5 + 0.5;
+      float smooth = fbm3(p * 0.8, time * 0.1) * 0.5 + 0.5;
       // Layer 2: Chaotic turbulence
-      float chaos = fbm(p * 2.3 + vec2(100.0, 50.0), time * 0.15, 4) * 0.5 + 0.5;
+      float chaos = fbm4(p * 2.3 + vec2(100.0, 50.0), time * 0.15) * 0.5 + 0.5;
       // Combine with distortion
       vec2 distortion = vec2(
-        fbm(p * 1.5 + time * 0.08, time, 2),
-        fbm(p * 1.5 - time * 0.08 + 50.0, time, 2)
+        fbm3(p * 1.5 + time * 0.08, time),
+        fbm3(p * 1.5 - time * 0.08 + 50.0, time)
       ) * 0.3;
       p += distortion;
 
@@ -263,7 +274,7 @@ export function register(engine) {
       }
 
       // Pregnant emptiness - subtle depth layers
-      float depth = fbm(p * 0.6, time * 0.05, 3) * 0.5 + 0.5;
+      float depth = fbm3(p * 0.6, time * 0.05) * 0.5 + 0.5;
 
       // Compose unseen - enhanced visibility
       vec3 unseen = atmosphere;
@@ -448,7 +459,7 @@ export function register(engine) {
       color += vec3(0.88, 0.84, 0.90) * glow;
 
       // === NATURAL ELEMENT: Smoke wisps ===
-      float smoke = fbm(uv * 3.0 + vec2(time * 0.02, time * 0.03), time * 0.1, 4);
+      float smoke = fbm4(uv * 3.0 + vec2(time * 0.02, time * 0.03), time * 0.1);
       smoke = pow(max(0.0, smoke), 3.0) * 0.08;
       vec3 smokeColor = vec3(0.15, 0.17, 0.21);
       color = mix(color, smokeColor, smoke * (1.0 - dualityFactor * 0.7));
