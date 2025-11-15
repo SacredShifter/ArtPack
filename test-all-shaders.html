@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Shader Validator</title>
+</head>
+<body>
+  <h1>Testing Shaders...</h1>
+  <div id="results"></div>
+  <script type="module">
+    const results = document.getElementById('results');
+
+    async function testPack(name, path) {
+      try {
+        const module = await import(path);
+
+        // Mock engine
+        const materials = {};
+        const engine = {
+          registerMaterial: (name, material) => {
+            materials[name] = material;
+          },
+          registerNode: () => {},
+          setParamMapper: () => {},
+          onUpdate: () => {},
+          updateUniforms: () => {}
+        };
+
+        module.register(engine);
+
+        // Get the material
+        const materialName = Object.keys(materials)[0];
+        const material = materials[materialName];
+
+        if (material) {
+          console.log(`[${name}] Fragment shader length:`, material.fragmentShader?.length || 0);
+          console.log(`[${name}] Vertex shader length:`, material.vertexShader?.length || 0);
+
+          // Try to validate
+          if (!material.fragmentShader || material.fragmentShader.length < 50) {
+            throw new Error('Fragment shader is empty or too short');
+          }
+
+          results.innerHTML += `<div style="color:green">✓ ${name}</div>`;
+        } else {
+          results.innerHTML += `<div style="color:orange">⚠ ${name} - No material registered</div>`;
+        }
+      } catch (err) {
+        results.innerHTML += `<div style="color:red">✗ ${name} - ${err.message}</div>`;
+        console.error(`[${name}] Error:`, err);
+      }
+    }
+
+    const packs = [
+      ['EternalVoid', './artpacks/theunseen/EternalVoid/index.js'],
+      ['WhisperField', './artpacks/theunseen/WhisperField/index.js'],
+      ['LiminalThreads', './artpacks/theunseen/LiminalThreads/index.js'],
+      ['HiddenLattice', './artpacks/theunseen/HiddenLattice/index.js'],
+      ['SynapticField', './artpacks/theunseen/SynapticField/index.js'],
+      ['InterferenceRealm', './artpacks/theunseen/InterferenceRealm/index.js'],
+      ['DualityThreshold', './artpacks/theunseen/DualityThreshold/index.js']
+    ];
+
+    for (const [name, path] of packs) {
+      await testPack(name, path);
+    }
+  </script>
+</body>
+</html>

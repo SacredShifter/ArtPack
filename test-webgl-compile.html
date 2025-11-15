@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html>
+<head><title>WebGL Shader Test</title></head>
+<body>
+<canvas id="c" width="400" height="400"></canvas>
+<pre id="log"></pre>
+<script>
+const log = document.getElementById('log');
+const canvas = document.getElementById('c');
+const gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
+
+if (!gl) {
+  log.textContent = 'WebGL not supported';
+} else {
+  fetch('./duality-full.glsl')
+    .then(r => r.text())
+    .then(fragmentSource => {
+      const vertexSource = `
+        attribute vec2 position;
+        varying vec2 vUv;
+        void main() {
+          vUv = position * 0.5 + 0.5;
+          gl_Position = vec4(position, 0.0, 1.0);
+        }
+      `;
+
+      // Compile vertex shader
+      const vs = gl.createShader(gl.VERTEX_SHADER);
+      gl.shaderSource(vs, vertexSource);
+      gl.compileShader(vs);
+
+      if (!gl.getShaderParameter(vs, gl.COMPILE_STATUS)) {
+        log.textContent = 'Vertex shader error:\\n' + gl.getShaderInfoLog(vs);
+        return;
+      }
+
+      // Compile fragment shader
+      const fs = gl.createShader(gl.FRAGMENT_SHADER);
+      gl.shaderSource(fs, fragmentSource);
+      gl.compileShader(fs);
+
+      if (!gl.getShaderParameter(fs, gl.COMPILE_STATUS)) {
+        const error = gl.getShaderInfoLog(fs);
+        log.textContent = 'Fragment shader error:\\n' + error;
+        console.error('GLSL Error:', error);
+
+        // Show line numbers around error
+        const match = error.match(/ERROR: \\d+:(\\d+)/);
+        if (match) {
+          const lineNum = parseInt(match[1]);
+          const lines = fragmentSource.split('\\n');
+          log.textContent += '\\n\\nContext:\\n';
+          for (let i = Math.max(0, lineNum-3); i < Math.min(lines.length, lineNum+3); i++) {
+            const marker = i === lineNum-1 ? ' >>> ' : '     ';
+            log.textContent += marker + (i+1) + ': ' + lines[i] + '\\n';
+          }
+        }
+        return;
+      }
+
+      log.textContent = '✓ Both shaders compiled successfully!';
+    })
+    .catch(err => {
+      log.textContent = 'Error loading shader: ' + err.message;
+    });
+}
+</script>
+</body>
+</html>
