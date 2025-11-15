@@ -1,14 +1,4 @@
-/**
- * DUALITY — THE UNSEEN & THE SEEN
- * Wave 3: Revelation | The Crown Jewel of The Unseen Series
- *
- * Where shadow meets form. Where the unexpressed becomes shape.
- * The threshold where consciousness recognizes itself.
- */
 
-import * as THREE from 'three';
-
-const sharedGLSL = `
 #define PI 3.14159265359
 #define TAU 6.28318530718
 #define PHI 1.618033988749
@@ -167,21 +157,7 @@ float dustSpeck(vec2 uv, vec2 speckPos, float size) {
   float dist = length(uv - speckPos);
   return smoothstep(size, 0.0, dist);
 }
-`;
 
-export function register(engine) {
-  const uniforms = {
-    uTime: { value: 0 },
-    uResolution: { value: new THREE.Vector2(1920, 1080) },
-    uCoherence: { value: 0.5 },
-    uStillness: { value: 0.5 },
-    uGain: { value: 0.5 },
-    uPhase: { value: 0.0 },
-    uSeed: { value: Math.random() * 1000 },
-  };
-
-  const fragmentShader = `
-    ${sharedGLSL}
 
     uniform float uTime;
     uniform vec2 uResolution;
@@ -466,65 +442,4 @@ export function register(engine) {
 
       gl_FragColor = vec4(color, 1.0);
     }
-  `;
-
-  const vertexShader = `
-    varying vec2 vUv;
-    void main() {
-      vUv = uv;
-      gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
-    }
-  `;
-
-  // Validate shader before creating material
-  console.log('[DualityThreshold] Fragment shader length:', fragmentShader.length);
-  console.log('[DualityThreshold] Vertex shader length:', vertexShader.length);
-
-  if (!fragmentShader || fragmentShader.length < 100) {
-    console.error('[DualityThreshold] Fragment shader is empty or too short!');
-  }
-
-  const dualityShader = new THREE.ShaderMaterial({
-    uniforms,
-    vertexShader,
-    fragmentShader,
-    transparent: false
-  });
-
-  // Log any shader compilation errors
-  dualityShader.onBeforeCompile = () => {
-    console.log('[DualityThreshold] Shader compiling...');
-  };
-
-  engine.registerMaterial('dualityMaterial', dualityShader);
-
-  engine.registerNode('dualityPlane', () => {
-    const geometry = new THREE.PlaneGeometry(20, 20, 1, 1);
-    return new THREE.Mesh(geometry, dualityShader);
-  });
-
-  engine.setParamMapper((region, coherence) => {
-    return {
-      uCoherence: coherence.individual || coherence.amplitude || 0,
-      uStillness: coherence.stillness || 0.5,
-      uGain: 0.5,
-      uPhase: coherence.phase || 0,
-    };
-  });
-
-  let time = 0;
-  engine.onFrame((deltaTime, t, params) => {
-    time += deltaTime * 0.5;
-
-    dualityShader.uniforms.uTime.value = time;
-    dualityShader.uniforms.uCoherence.value = params.uCoherence || 0;
-    dualityShader.uniforms.uStillness.value = params.uStillness || 0.5;
-    dualityShader.uniforms.uGain.value = params.uGain || 0.5;
-    dualityShader.uniforms.uPhase.value = params.uPhase || 0;
-    dualityShader.uniforms.uSeed.value = 50;
-
-    if (window.innerWidth && window.innerHeight) {
-      dualityShader.uniforms.uResolution.value.set(window.innerWidth, window.innerHeight);
-    }
-  });
-}
+  
