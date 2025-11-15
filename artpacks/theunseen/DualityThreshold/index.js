@@ -419,10 +419,10 @@ export function register(engine) {
       float vignette = lensVignette(uv, 0.35);
       color *= vignette;
 
-      // 2. Chromatic aberration (subtle)
-      vec2 chromaticUv = uv + chromaticOffset(uv, 0.002);
-      float redShift = smoothstep(0.4, 0.6, length(uv - 0.5)) * 0.015;
-      color.r = mix(color.r, renderSeenLayer(chromaticUv, time, uSeed, uGain).r, redShift);
+      // 2. Chromatic aberration (subtle) - apply to current color
+      vec2 chromaticShift = chromaticOffset(uv, 0.002);
+      float aberrationAmount = smoothstep(0.4, 0.6, length(uv - 0.5)) * 0.008;
+      color.r += aberrationAmount * (color.r - color.g);
 
       // 3. Bloom around highlights
       float luminance = dot(color, vec3(0.299, 0.587, 0.114));
