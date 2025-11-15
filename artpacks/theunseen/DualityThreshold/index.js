@@ -402,16 +402,13 @@ export function register(engine) {
       // Interference zone: where layers meet, create shimmer
       float interferenceZone = smoothstep(0.35, 0.45, uCoherence) *
                                (1.0 - smoothstep(0.55, 0.65, uCoherence));
-      if (interferenceZone > 0.0) {
-        // Add subtle color shift in threshold zone
-        float shimmer = snoise(uv * 20.0 + time * 0.5) * 0.5 + 0.5;
-        vec3 thresholdColor = mix(
-          vec3(0.4, 0.5, 0.7),
-          vec3(0.9, 0.7, 0.5),
-          shimmer
-        );
-        color = mix(color, color + thresholdColor * 0.15, interferenceZone * shimmer);
-      }
+      float shimmer = snoise(uv * 20.0 + time * 0.5) * 0.5 + 0.5;
+      vec3 thresholdColor = mix(
+        vec3(0.4, 0.5, 0.7),
+        vec3(0.9, 0.7, 0.5),
+        shimmer
+      );
+      color = mix(color, color + thresholdColor * 0.15, interferenceZone * shimmer);
 
       // === PHOTOGRAPHIC DEGRADATION PASS ===
 
@@ -426,10 +423,8 @@ export function register(engine) {
 
       // 3. Bloom around highlights
       float luminance = dot(color, vec3(0.299, 0.587, 0.114));
-      if (luminance > 0.6) {
-        float bloom = pow(luminance - 0.6, 1.5) * 0.25;
-        color += vec3(0.95, 0.90, 0.85) * bloom;
-      }
+      float bloom = pow(max(0.0, luminance - 0.6), 1.5) * 0.25;
+      color += vec3(0.95, 0.90, 0.85) * bloom;
 
       // 4. Dust specks (lens imperfections)
       float dust = 0.0;
@@ -448,10 +443,9 @@ export function register(engine) {
       color += vec3(grain);
 
       // 7. Subtle glow for high coherence
-      if (uCoherence > 0.6) {
-        float glow = pow(dualityFactor, 2.0) * 0.15;
-        color += vec3(0.88, 0.84, 0.90) * glow;
-      }
+      float glowMask = smoothstep(0.6, 0.7, uCoherence);
+      float glow = pow(dualityFactor, 2.0) * 0.15 * glowMask;
+      color += vec3(0.88, 0.84, 0.90) * glow;
 
       // === NATURAL ELEMENT: Smoke wisps ===
       float smoke = fbm(uv * 3.0 + vec2(time * 0.02, time * 0.03), time * 0.1, 4);
